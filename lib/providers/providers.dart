@@ -1,4 +1,6 @@
 import 'package:citizen/providers/auth_provider.dart';
+import 'package:citizen/providers/directory_provider.dart';
+import 'package:citizen/providers/hotlines_provider.dart';
 import 'package:citizen/providers/location_provider.dart';
 import 'package:citizen/providers/news_provider.dart';
 import 'package:citizen/providers/services_provider.dart';
@@ -11,4 +13,6 @@ List<SingleChildWidget> independentProviders = [
   ChangeNotifierProvider(create: (_) => LocationProvider()),
   ChangeNotifierProvider(create: (_) => AuthProvider()),
   ChangeNotifierProvider(create: (_) => ServicesProvider()),
+  ChangeNotifierProvider(create: (_) => DirectoryProvider()),
+  ChangeNotifierProvider(create: (_) => HotlinesProvider()),
 ];

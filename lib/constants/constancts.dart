@@ -1,7 +1,7 @@
 import 'package:citizen/constants/custom_route_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
+import 'package:open_mail_app/open_mail_app.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -15,14 +15,16 @@ getFormattedDate(String str) {
   return DateFormat("MMMM d yyyy").format(dt);
   //print(DateFormat("EEE, d MMMM d yyyy HH:mm:ss").format(dt));
 }
+
 getFormattedDateTime(String str) {
   //var str = "2023-01-20T15:20:32.000000Z";
   var newStr = str.substring(0, 10) + ' ' + str.substring(11, 23);
   DateTime dt = DateTime.parse(newStr);
 
-   return DateFormat("MMMM d yyyy hh:mm:ss a").format(dt);
-   return DateFormat("EEE, d MMMM d yyyy HH:mm:ss").format(dt);
+  return DateFormat("MMMM d yyyy hh:mm:ss a").format(dt);
+  return DateFormat("EEE, d MMMM d yyyy HH:mm:ss").format(dt);
 }
+
 getCurrentTime() {
   var time = DateFormat('hh:mm a').format(DateTime.now());
   return time;
@@ -66,13 +68,58 @@ Future<void> makePhoneCall(String phoneNumber) async {
   await launchUrl(launchUri);
 }
 
+Future<void> openMail(context, String receiver, String subject) async {
+  var apps = await OpenMailApp.getMailApps();
+
+  if (apps.isEmpty) {
+    showNoMailAppsDialog(context);
+  } else {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return MailAppPickerDialog(
+          mailApps: apps,
+          emailContent: EmailContent(
+            to: [
+              receiver,
+            ],
+            subject: subject,
+          ),
+        );
+      },
+    );
+  }
+}
+
+void showNoMailAppsDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("Open Mail App"),
+        content: Text("No mail apps installed"),
+        actions: <Widget>[
+          TextButton(
+            child: Text("OK"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          )
+        ],
+      );
+    },
+  );
+}
+
 nextScreen(context, widget) {
   Navigator.push(context, CustomRoute(builder: (context) => widget));
   //Navigator.push(context, MaterialPageRoute(builder: (context) => widget));
 }
-replaceScreen(context,widget){
-  Navigator.pushReplacement(context, CustomRoute(builder: (context)=>widget));
+
+replaceScreen(context, widget) {
+  Navigator.pushReplacement(context, CustomRoute(builder: (context) => widget));
 }
+
 class Constraints {
   static String infoIcon = 'assets/icons/alert/info.png';
   static String successIcon = 'assets/icons/alert/success.png';
@@ -82,13 +129,12 @@ class Constraints {
 
 enum AlertType { INFO, WARNING, ERROR, SUCCESS }
 
-
 showAlertDialog(context, title, message,
     {type = AlertType.INFO,
-      okButtonText = 'Ok',
-      onPress = null,
-      showCancelButton = true,
-      dismissible = true}) {
+    okButtonText = 'Ok',
+    onPress = null,
+    showCancelButton = true,
+    dismissible = true}) {
   String icon;
 
   switch (type) {
@@ -121,7 +167,7 @@ showAlertDialog(context, title, message,
           curve = Curves.fastLinearToSlowEaseIn;
         }
         var tween =
-        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
         return ScaleTransition(
           scale: anim.drive(tween),
           child: child,
@@ -195,4 +241,3 @@ showAlertDialog(context, title, message,
         );
       });
 }
-

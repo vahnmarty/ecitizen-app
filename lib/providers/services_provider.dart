@@ -63,7 +63,6 @@ class ServicesProvider with ChangeNotifier {
     List<ReportModel> list =[];
     final token = await getToken();
     final response = await ApiService().getRequest(Apis.report,token: token);
-
     if(response !=null){
       for(var i=0;i<response.length;i++){
         list.add(ReportModel.fromJson(response[i]));

@@ -9,6 +9,8 @@ class Apis{
   static const services = "services";
   static const report = "report";
   static const reportEmergency = "report/emergency";
+  static const directory = "directory";
+  static const hotlines = "hotlines";
 
 
 }

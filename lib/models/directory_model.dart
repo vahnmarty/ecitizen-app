@@ -1,4 +1,4 @@
-class Directory {
+class DirectoryModel {
   String? id;
   String? name;
   String? address;
@@ -17,7 +17,7 @@ class Directory {
   String? createdAt;
   String? updatedAt;
 
-  Directory(
+  DirectoryModel(
       {this.id,
         this.name,
         this.address,
@@ -36,7 +36,7 @@ class Directory {
         this.createdAt,
         this.updatedAt});
 
-  Directory.fromJson(Map<String, dynamic> json) {
+  DirectoryModel.fromJson(Map<String, dynamic> json) {
     id = json['id'].toString();
     name = json['name'];
     address = json['address'];

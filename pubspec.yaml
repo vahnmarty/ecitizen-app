@@ -45,6 +45,7 @@ dependencies:
   geocoding: ^2.0.5
   location: ^4.4.0
   shared_preferences: ^2.0.17
+  open_mail_app: ^0.4.5
 
 
 dev_dependencies:

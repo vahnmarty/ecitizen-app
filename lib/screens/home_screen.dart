@@ -9,6 +9,7 @@ import 'package:citizen/models/user_model.dart';
 import 'package:citizen/providers/auth_provider.dart';
 import 'package:citizen/providers/location_provider.dart';
 import 'package:citizen/screens/LGU_offices_screen.dart';
+import 'package:citizen/screens/about_screen.dart';
 import 'package:citizen/screens/emergency_hotlines_screen.dart';
 import 'package:citizen/screens/lgu_profile_screen.dart';
 import 'package:citizen/screens/login_screen.dart';
@@ -21,6 +22,7 @@ import 'package:citizen/widgets/home_screen_drop_down.dart';
 import 'package:citizen/widgets/rounded_center_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/news_provider.dart';
@@ -413,7 +415,15 @@ class _DrawerLayout extends StatelessWidget {
               ListTile(
                 title: const Text('H O M E'),
                 onTap: () {
-                  replaceScreen(context, HomeScreen());
+                  //replaceScreen(context, HomeScreen());
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                title: const Text('A B O U T'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  nextScreen(context, const AboutScreen());
                 },
               ),
               ListTile(
@@ -423,15 +433,10 @@ class _DrawerLayout extends StatelessWidget {
                   if (token == false || token == null || token == '') {
                     Navigator.of(context).pop();
                     showAlertDialog(
-                      context,
-                      'Login First',
-                      'Please login to Continue',
-                      showCancelButton: false,
-                      okButtonText: '',
-                      onPress: (){
-                        Navigator.of(context).pop();
-                      }
-                    );
+                        context, 'Login First', 'Please login to Continue',
+                        showCancelButton: false, okButtonText: '', onPress: () {
+                      Navigator.of(context).pop();
+                    });
                   } else {
                     Navigator.of(context).pop();
                     nextScreen(context, const MyReportsScreen());
@@ -457,15 +462,38 @@ class _DrawerLayout extends StatelessWidget {
                     title:
                         Text(provider.isLogin ? 'L O G O U T ' : 'L O G I N'),
                     onTap: () {
-                      Navigator.of(context).pop();
-                      provider.isLogin
-                          ? replaceScreen(context, HomeScreen())
-                          : null;
-                      provider.isLogin
-                          ? logout()
-                          : nextScreen(context, const LoginScreen());
+                      if (provider.isLogin) {
+
+                        showAlertDialog(
+                            context, 'Logout', 'Are you want to logout!',
+                            showCancelButton: true,
+                            okButtonText: 'Logout', onPress: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          logout();
+                          provider.isLogin = false;
+
+                        });
+                      } else {
+                        Navigator.of(context).pop();
+                        nextScreen(context, const LoginScreen());
+                      }
+
                     },
                   );
+                },
+              ),
+              ListTile(
+                title: const Text('C L O S E A P P'),
+                leading: Icon(Icons.close_sharp),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  showAlertDialog(
+                      context, 'Exit', 'Are your sure you want to exit app?',
+                      type: AlertType.WARNING,
+                      okButtonText: 'Close App', onPress: () {
+                    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+                  }, showCancelButton: true);
                 },
               ),
             ],

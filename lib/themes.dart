@@ -15,6 +15,8 @@ abstract class AppColors {
   static const mainColor = Color(0xff374151);
   static const reportLightRed = Color(0xffFEF1F2);
   static const reportDarkRed = Color(0xffBC2624);
+  static const gradientPurple = Color(0xffB11855);
+  static const gradientBlue = Color(0xff3b76f6);
 
   static const secondary = Color(0xff3b76f6);
   static const accent = Color(0xffd67558);

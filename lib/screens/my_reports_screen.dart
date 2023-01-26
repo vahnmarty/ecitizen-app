@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:citizen/models/report_model.dart';
 import 'package:citizen/providers/services_provider.dart';
+import 'package:citizen/widgets/title_card_with_shadow.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -49,30 +50,7 @@ class _MyReportsScreenState extends State<MyReportsScreen> {
         builder: (context, provider, child) {
           return Column(
             children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        spreadRadius: 1,
-                        blurRadius: 4,
-                        offset:
-                            const Offset(0, 2), // changes position of shadow
-                      ),
-                    ],
-                    border: Border(
-                        top: BorderSide(
-                      width: 1,
-                      color: Colors.grey.withOpacity(0.2),
-                    ))),
-                child: Text(
-                  'My Reports',
-                  style: cardHeadingStyle.copyWith(color: Colors.black),
-                ),
-              ),
+              const TitleCardWithShadow(title: 'My Reports'),
               provider.isLoading
                   ? const Padding(
                       padding: EdgeInsets.only(top: 60.0),

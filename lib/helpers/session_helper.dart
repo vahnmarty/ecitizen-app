@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:citizen/constants/constancts.dart';
+import 'package:citizen/providers/auth_provider.dart';
+import 'package:citizen/screens/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -34,7 +37,7 @@ getToken() async {
     }
     return false;
   } catch (e) {
-    debugPrint(e.toString());
+    debugPrint('error :'+e.toString());
     return false;
   }
 }
