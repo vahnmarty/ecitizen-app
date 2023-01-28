@@ -17,6 +17,7 @@ import 'package:citizen/screens/my_reports_screen.dart';
 import 'package:citizen/screens/news_and_announcements.dart';
 import 'package:citizen/screens/online_payments_screen.dart';
 import 'package:citizen/screens/report_emergency_screen.dart';
+import 'package:citizen/screens/service_screen.dart';
 import 'package:citizen/screens/signup_screen.dart';
 import 'package:citizen/widgets/home_screen_drop_down.dart';
 import 'package:citizen/widgets/rounded_center_button.dart';
@@ -29,6 +30,10 @@ import '../providers/news_provider.dart';
 import '../providers/services_provider.dart';
 import '../themes.dart';
 
+final List<ServiceModel> _dropDownItems = [
+  ServiceModel(name: "I want to apply for....")
+];
+
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key}) : super(key: key);
 
@@ -40,7 +45,13 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   //var _dropDownSelectedValue = _dropDownItems.first;
-  _dropDownCallBack(String? val) {}
+  _dropDownCallBack(String? val) {
+    //debugPrint('selectedval:$val');
+    if(val == '0'){
+      return;
+    }
+    nextScreen(context, ServiceScreen(id: val!));
+  }
 
   double gap = 6.0;
 
@@ -184,10 +195,16 @@ class _HomeScreenState extends State<HomeScreen> {
               Consumer<ServicesProvider>(
                 builder: (context, servicesProvider, child) {
                   return servicesProvider.isLoading
-                      ? const SizedBox()
-                      : HomeScreenDropDown(
-                          callback: _dropDownCallBack,
-                        );
+                      ? HomeScreenDropDown(
+                          callback: (String val) {
+                            debugPrint('selected $val');
+                          }, list: _dropDownItems)
+                      : servicesProvider.services.isNotEmpty
+                          ? HomeScreenDropDown(
+                              list: servicesProvider.services,
+                              callback: _dropDownCallBack,
+                            )
+                          : const SizedBox();
                 },
               ),
               Padding(
@@ -197,6 +214,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       child: ReportCard(
                         callback: () async {
+                          bool connected = await internetConnectivity();
+                          debugPrint('result: $connected');
+                          if (!connected) {
+                            nextScreen(context, ReportEmergencyScreen());
+                            return;
+                          }
                           final token = await getToken();
                           if (token == false || token == '' || token == null) {
                             showAlertDialog(context, 'Login First',
@@ -240,7 +263,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: ProfileOfficesCard(
                       callback: () {
-                        nextScreen(context, const LGUProfileScreen());
+                        nextScreen(context, const AboutScreen());
+                        //nextScreen(context, const LGUProfileScreen());
                       },
                       isProfile: true,
                     ),
@@ -443,12 +467,12 @@ class _DrawerLayout extends StatelessWidget {
                   }
                 },
               ),
-              ListTile(
+              /*ListTile(
                 title: const Text('S E R V I C E S '),
                 onTap: () {
                   Navigator.of(context).pop();
                 },
-              ),
+              ),*/
               Container(
                 color: Colors.grey,
                 height: .5,
@@ -463,7 +487,6 @@ class _DrawerLayout extends StatelessWidget {
                         Text(provider.isLogin ? 'L O G O U T ' : 'L O G I N'),
                     onTap: () {
                       if (provider.isLogin) {
-
                         showAlertDialog(
                             context, 'Logout', 'Are you want to logout!',
                             showCancelButton: true,
@@ -472,13 +495,11 @@ class _DrawerLayout extends StatelessWidget {
                           Navigator.of(context).pop();
                           logout();
                           provider.isLogin = false;
-
                         });
                       } else {
                         Navigator.of(context).pop();
                         nextScreen(context, const LoginScreen());
                       }
-
                     },
                   );
                 },

@@ -1,4 +1,3 @@
-
 import 'package:citizen/constants/constancts.dart';
 import 'package:citizen/providers/location_provider.dart';
 import 'package:citizen/providers/services_provider.dart';
@@ -12,6 +11,7 @@ import '../helpers/session_helper.dart';
 import '../themes.dart';
 import '../widgets/bottom_navigation.dart';
 import '../widgets/raised_btn.dart';
+import '../widgets/upload_image_widget.dart';
 
 final List<String> _emergencies = [
   'Fire',
@@ -36,11 +36,8 @@ class ReportEmergencyScreen extends StatelessWidget {
     _selectedValue.value = _emergencies[index];
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-
     final locProvider = Provider.of<LocationProvider>(context);
     if (locProvider.address != '') {
       _locationController.text = locProvider.address;
@@ -161,7 +158,7 @@ class ReportEmergencyScreen extends StatelessWidget {
                   ),
                   errorText: '',
                   errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
+                      borderSide: const BorderSide(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8)),
                   errorStyle: TextStyle(
                     fontSize: 11,
@@ -173,6 +170,14 @@ class ReportEmergencyScreen extends StatelessWidget {
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Text(
+                  'Upload Photos (Optional)',
+                  style: _commonTextStyle,
+                ),
+              ),
+              const UploadImageWidget(),
               TermsCheckbox(
                 callBack: (bool val) {
                   _checked = val;
@@ -189,6 +194,12 @@ class ReportEmergencyScreen extends StatelessWidget {
                       : RaisedBtn(
                           title: 'Submit Report',
                           callback: () async {
+                            bool connected = await internetConnectivity();
+                            if(!connected){
+                              sendSms('Hello','+923116266746');
+                              //replaceScreen(context, HomeScreen());
+                              return;
+                            }
                             final token = await getToken();
                             if (token == false ||
                                 token == null ||

@@ -6,9 +6,10 @@ import 'package:provider/provider.dart';
 import '../themes.dart';
 
 class HomeScreenDropDown extends StatefulWidget {
+  final List<ServiceModel> list;
   final Function callback;
 
-  const HomeScreenDropDown({Key? key, required this.callback})
+  const HomeScreenDropDown({Key? key, required this.callback,required this.list})
       : super(key: key);
 
   @override
@@ -18,22 +19,12 @@ class HomeScreenDropDown extends StatefulWidget {
 class _HomeScreenDropDownState extends State<HomeScreenDropDown> {
   String _selectedValue = 'I want to apply for....';
   bool _isSelected = false;
-  final List<ServiceModel> _dropDownItems = [
-    ServiceModel(name: "I want to apply for....")
-  ];
+
   @override
   Widget build(BuildContext context) {
-    List<ServiceModel> list =[];
-    final serviceProvider = Provider.of<ServicesProvider>(context);
-    if(serviceProvider.isLoading){
-      list = _dropDownItems;
-    }else{
-      list=  serviceProvider.services;
-    }
-
     //debugPrint('1:${_selectedValue}');
     if (!_isSelected) {
-      _selectedValue = list.first.name!;
+      _selectedValue = widget.list[0].name!;
     }
     return Container(
       width: double.infinity,
@@ -58,7 +49,7 @@ class _HomeScreenDropDownState extends State<HomeScreenDropDown> {
           underline: Container(
             color: Colors.transparent,
           ),
-          items: list.map<DropdownMenuItem<String>>((ServiceModel val) {
+          items: widget.list.map<DropdownMenuItem<String>>((ServiceModel val) {
             return DropdownMenuItem(
                 value: val.name,
                 child: Text(
@@ -69,7 +60,8 @@ class _HomeScreenDropDownState extends State<HomeScreenDropDown> {
           onChanged: (String? val) {
             _isSelected = true;
             _selectedValue = val!;
-            widget.callback(val);
+
+            widget.callback(widget.list.firstWhere((element) => element.name==val).id.toString());
             setState(() {});
           }),
     );

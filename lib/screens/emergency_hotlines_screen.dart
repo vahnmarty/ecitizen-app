@@ -3,7 +3,7 @@ import 'package:citizen/providers/hotlines_provider.dart';
 import 'package:citizen/screens/LGU_offices_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter/src/material/dropdown.dart';
 import '../constants/constancts.dart';
 import '../themes.dart';
 import '../widgets/bottom_navigation.dart';
@@ -17,6 +17,15 @@ class EmergencyHotlinesScreen extends StatefulWidget {
 }
 
 class _EmergencyHotlinesScreenState extends State<EmergencyHotlinesScreen> {
+  List<String> hotlineCategories = [
+    "All",
+    "Police Station",
+    "Fire Station",
+    "Medical Assistance",
+    "Red Cross",
+    "Local Government"
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -51,31 +60,48 @@ class _EmergencyHotlinesScreenState extends State<EmergencyHotlinesScreen> {
               color: AppColors.iconLightGrey,
             )),
       ),
-      body: Consumer<HotlinesProvider>(
-        builder: (context, provider, child) {
-          return provider.isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.mainColor,
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GridView(
-                    physics: const BouncingScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 200, mainAxisExtent: 140),
-                    children: [
-                      ...List.generate(
-                          provider.myHotlines.length,
-                          (index) => _HotlinesListItem(
-                              hotline: provider.myHotlines[index])),
-                    ],
-                  ),
-                );
-        },
+      body: Column(
+        children: [
+          DropDownWidget(
+              list: hotlineCategories,
+              callback: (String val) {
+                debugPrint('selval: $val');
+              }),
+          Expanded(
+            child: Consumer<HotlinesProvider>(
+              builder: (context, provider, child) {
+                return provider.isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.mainColor,
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListView.builder(
+                            itemCount: provider.myHotlines.length,
+                            itemBuilder: (context, index) {
+                              return _HotlinesListItem(
+                                  hotline: provider.myHotlines[index]);
+                            }),
+                        /*child: GridView(
+                          physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 200, mainAxisExtent: 240),
+                          children: [
+                            ...List.generate(
+                                provider.myHotlines.length,
+                                (index) => _HotlinesListItem(
+                                    hotline: provider.myHotlines[index])),
+                          ],
+                        ),*/
+                      );
+              },
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: const BottomNavigation(),
     );
@@ -103,33 +129,107 @@ class _HotlinesListItem extends StatelessWidget {
             ),
           ],
           borderRadius: BorderRadius.circular(8)),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          //crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              hotline.name!,
-              style:
-                  cardHeadingStyle.copyWith(fontSize: 18, color: Colors.black),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            SizedBox(
-              height: 30,
-              child: ListView.builder(itemCount: hotline.numbers!.length,itemBuilder: (context,index){
-                return  IconsAndText(
-                    text: hotline.numbers![index].number!,
-                    icon: Icons.phone,
-                    iconColor: Colors.grey,
-                    textColor: Colors.black);
-              }),
-            ),
-
-          ],
+      child: InkWell(
+        onTap: () {
+          if (hotline.numbers![0].number!.isNotEmpty) {
+            makePhoneCall(hotline.numbers![0].number!);
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            //mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                hotline.name!,
+                style: cardHeadingStyle.copyWith(
+                    fontSize: 16, color: Colors.black),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              ...List.generate(
+                  hotline.numbers!.length,
+                  (index) => Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: TextButton(
+                          onPressed: (){makePhoneCall(hotline.numbers![index].number!);},
+                          child: IconsAndText(
+                              text: hotline.numbers![index].number!,
+                              icon: Icons.phone,
+                              iconColor: Colors.red,
+                              textColor: Colors.red),
+                        ),
+                      )),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class DropDownWidget extends StatefulWidget {
+  final List<String> list;
+  final Function callback;
+
+  DropDownWidget({Key? key, required this.list, required this.callback})
+      : super(key: key);
+
+  @override
+  State<DropDownWidget> createState() => _DropDownWidgetState();
+}
+
+class _DropDownWidgetState extends State<DropDownWidget> {
+  String selectedValue = '';
+
+  bool init = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!init) {
+      selectedValue = widget.list.first;
+    }
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, right: 16, top: 16),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  offset: const Offset(2, 2),
+                  blurRadius: 2,
+                  spreadRadius: 2),
+            ]),
+        child: DropdownButton(
+            value: selectedValue,
+            isExpanded: true,
+            icon: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: AppColors.iconLightGrey,
+            ),
+            underline: Container(
+              color: Colors.transparent,
+            ),
+            items: widget.list.map<DropdownMenuItem<String>>((String val) {
+              return DropdownMenuItem(
+                  value: val,
+                  child: Text(
+                    val,
+                    style: const TextStyle(fontWeight: FontWeight.w400),
+                  ));
+            }).toList(),
+            onChanged: (String? val) {
+              init = true;
+              selectedValue = val!;
+              widget.callback(val);
+              setState(() {});
+            }),
       ),
     );
   }

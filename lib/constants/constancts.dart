@@ -4,6 +4,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:open_mail_app/open_mail_app.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:sms_advanced/sms_advanced.dart';
+
+import 'dart:io';
 
 const cardHeadingStyle =
     TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.white);
@@ -241,3 +244,36 @@ showAlertDialog(context, title, message,
         );
       });
 }
+
+internetConnectivity() async {
+  try {
+    final result = await InternetAddress.lookup('example.com');
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      //print('connected');
+      return true;
+    }
+  } on SocketException catch (_) {
+    //print('not connected');
+    return false;
+  }
+}
+
+void sendSms(String message, String recipent) async {
+  SmsSender sender = new SmsSender();
+  String address ='+923116266746';
+  try{
+    SmsMessage message = new SmsMessage(address, 'Hello flutter world!');
+    message.onStateChanged.listen((state) {
+      if (state == SmsMessageState.Sent) {
+        print("SMS is sent!");
+      } else if (state == SmsMessageState.Delivered) {
+        print("SMS is delivered!");
+      }
+    });
+    sender.sendSms(message);
+  }catch(e){
+    debugPrint('sms error $e');
+  }
+
+  }
+

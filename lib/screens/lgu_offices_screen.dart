@@ -26,7 +26,8 @@ class _LGUOfficesScreenState extends State<LGUOfficesScreen> {
     }
   }
 
-  int _selectedCardIndex = 0;
+  int _selectedCardIndex = -1;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +56,34 @@ class _LGUOfficesScreenState extends State<LGUOfficesScreen> {
       body: Column(
         children: [
           const TitleCardWithShadow(title: 'LGU Offices Directory'),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8, top: 8),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: ' Type to search here',
+                labelStyle: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
+                errorText: '',
+                errorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8)),
+                errorStyle: TextStyle(
+                  fontSize: 11,
+                  color: Theme.of(context).errorColor,
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: AppColors.mainColor),
+                    borderRadius: BorderRadius.circular(8)),
+                contentPadding: EdgeInsets.zero,
+              ),
+              onChanged: (String value) {
+                setState(() {});
+              },
+            ),
+          ),
           Expanded(child: Consumer<DirectoryProvider>(
             builder: (context, provider, child) {
               return provider.isLoading
@@ -67,7 +96,42 @@ class _LGUOfficesScreenState extends State<LGUOfficesScreen> {
                       physics: const BouncingScrollPhysics(),
                       itemCount: provider.myDirectories.length,
                       itemBuilder: (context, index) {
-                        return _DirectoryListItem(
+                        if (_searchController.text.toString().trim() == '') {
+                          return _DirectoryListItem(
+                            index: index,
+                            isSelected: _selectedCardIndex == index,
+                            directory: provider.myDirectories[index],
+                            callback: (int selectedIndex) {
+                              _selectedCardIndex = selectedIndex;
+
+                              setState(() {});
+                            },
+                          );
+                        }
+                        if (provider.myDirectories[index].name!
+                                .toLowerCase()
+                                .contains(_searchController.text
+                                    .toString()
+                                    .toLowerCase()) ||
+                            provider.myDirectories[index].address!
+                                .toLowerCase()
+                                .contains(_searchController.text
+                                    .toString()
+                                    .toLowerCase()) ||
+                            provider.myDirectories[index].telephone!
+                                .contains(_searchController.text)) {
+                          return _DirectoryListItem(
+                            index: index,
+                            isSelected: _selectedCardIndex == index,
+                            directory: provider.myDirectories[index],
+                            callback: (int selectedIndex) {
+                              _selectedCardIndex = selectedIndex;
+
+                              setState(() {});
+                            },
+                          );
+                        }
+                        return const SizedBox() /*_DirectoryListItem(
                           index: index,
                           isSelected: _selectedCardIndex == index,
                           directory: provider.myDirectories[index],
@@ -76,7 +140,8 @@ class _LGUOfficesScreenState extends State<LGUOfficesScreen> {
 
                             setState(() {});
                           },
-                        );
+                        )*/
+                            ;
                       });
             },
           )),
@@ -133,54 +198,59 @@ class _DirectoryListItem extends StatelessWidget {
                       color: isSelected ? Colors.white : Colors.black),
                 ),
               ),
-              IconsAndText(
-                text: directory.address!,
-                icon: Icons.location_on,
-                iconColor: Colors.green,
-                textColor: isSelected ? Colors.white : Colors.black,
-              ),
+              if (directory.address != '')
+                IconsAndText(
+                  text: directory.address!,
+                  icon: Icons.location_on,
+                  iconColor: Colors.green,
+                  textColor: isSelected ? Colors.white : Colors.black,
+                ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: IconsAndText(
-                        text: directory.cellphone!,
-                        icon: Icons.phone,
-                        iconColor: Colors.blue,
-                        textColor: isSelected ? Colors.white : Colors.black,
+                    if (directory.cellphone != '')
+                      Expanded(
+                        child: IconsAndText(
+                          text: directory.cellphone!,
+                          icon: Icons.phone,
+                          iconColor: Colors.blue,
+                          textColor: isSelected ? Colors.white : Colors.black,
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: IconsAndText(
-                        text: directory.email!,
-                        icon: Icons.mail_outline_sharp,
-                        iconColor: AppColors.gradientPurple,
-                        textColor: isSelected ? Colors.white : Colors.black,
+                    if (directory.email != '')
+                      Expanded(
+                        child: IconsAndText(
+                          text: directory.email!,
+                          icon: Icons.mail_outline_sharp,
+                          iconColor: AppColors.gradientPurple,
+                          textColor: isSelected ? Colors.white : Colors.black,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
               Row(
                 children: [
-                  _CardButton(
-                    email: false,
-                    callback: () {
-                      makePhoneCall(directory.cellphone!);
-                    },
-                    isSelected: isSelected,
-                  ),
+                  if (directory.cellphone != '')
+                    _CardButton(
+                      email: false,
+                      callback: () {
+                        makePhoneCall(directory.cellphone!);
+                      },
+                      isSelected: isSelected,
+                    ),
                   const SizedBox(
                     width: 12,
                   ),
-                  _CardButton(
-                    email: true,
-                    callback: () {
-                      openMail(context,directory.email!,directory.name!);
-                    },
-                    isSelected: isSelected,
-                  ),
+                  if (directory.email != '')
+                    _CardButton(
+                      email: true,
+                      callback: () {
+                        openMail(context, directory.email!, directory.name!);
+                      },
+                      isSelected: isSelected,
+                    ),
                 ],
               ),
             ],
