@@ -10,6 +10,14 @@ class ServicesProvider with ChangeNotifier {
   bool _isLoading = false;
   List<ServiceModel> _services = [];
   List<ReportModel> _myReports=[];
+  BusinessServiceModel _businessServiceModel = BusinessServiceModel();
+
+  BusinessServiceModel get businessServiceModel => _businessServiceModel;
+
+  set businessServiceModel(BusinessServiceModel value) {
+    _businessServiceModel = value;
+    notifyListeners();
+  }
 
   List<ReportModel> get myReports => _myReports;
 
@@ -70,5 +78,13 @@ class ServicesProvider with ChangeNotifier {
       myReports=list;
     }
     _isLoading=false;
+  }
+  gettingBusinessServiceModel(String id)async{
+    isLoading=true;
+    final response =await ApiService().getRequest('${Apis.services}/$id');
+    if(response !=null){
+      businessServiceModel = BusinessServiceModel.fromJson(response);
+    }
+    isLoading=false;
   }
 }

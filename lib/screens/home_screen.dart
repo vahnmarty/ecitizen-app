@@ -1,3 +1,4 @@
+import 'package:citizen/api/api.dart';
 import 'package:citizen/cards/hotlines_card.dart';
 import 'package:citizen/cards/payments_card.dart';
 import 'package:citizen/cards/profile_offices_card.dart';
@@ -14,7 +15,7 @@ import 'package:citizen/screens/emergency_hotlines_screen.dart';
 import 'package:citizen/screens/lgu_profile_screen.dart';
 import 'package:citizen/screens/login_screen.dart';
 import 'package:citizen/screens/my_reports_screen.dart';
-import 'package:citizen/screens/news_and_announcements.dart';
+import 'package:citizen/screens/news_and_announcements_widget.dart';
 import 'package:citizen/screens/online_payments_screen.dart';
 import 'package:citizen/screens/report_emergency_screen.dart';
 import 'package:citizen/screens/service_screen.dart';
@@ -45,12 +46,12 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   //var _dropDownSelectedValue = _dropDownItems.first;
-  _dropDownCallBack(String? val) {
+  _dropDownCallBack(String? id) {
     //debugPrint('selectedval:$val');
-    if(val == '0'){
+    if (id == '0') {
       return;
     }
-    nextScreen(context, ServiceScreen(id: val!));
+    nextScreen(context, ServiceScreen(id: id!));
   }
 
   double gap = 6.0;
@@ -61,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
         context.read<ServicesProvider>().getServices();
-        context.read<NewsProvider>().gettingNews();
+        context.read<NewsProvider>().gettingNews(Apis.news);
         context.read<LocationProvider>().getCurrentLocation();
         context.read<AuthProvider>().checkUserSession();
       });
@@ -198,7 +199,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ? HomeScreenDropDown(
                           callback: (String val) {
                             debugPrint('selected $val');
-                          }, list: _dropDownItems)
+                          },
+                          list: _dropDownItems)
                       : servicesProvider.services.isNotEmpty
                           ? HomeScreenDropDown(
                               list: servicesProvider.services,
@@ -214,6 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       child: ReportCard(
                         callback: () async {
+
                           bool connected = await internetConnectivity();
                           debugPrint('result: $connected');
                           if (!connected) {
@@ -282,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              const NewsAndAnnouncements(),
+              const NewsAndAnnouncementsWidget(),
             ],
           ),
         ),

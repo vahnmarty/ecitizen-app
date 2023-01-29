@@ -1,12 +1,18 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:citizen/constants/custom_route_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:open_mail_app/open_mail_app.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:sms_advanced/sms_advanced.dart';
 
 import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 
 const cardHeadingStyle =
     TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.white);
@@ -99,11 +105,11 @@ void showNoMailAppsDialog(BuildContext context) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text("Open Mail App"),
-        content: Text("No mail apps installed"),
+        title: const Text("Open Mail App"),
+        content: const Text("No mail apps installed"),
         actions: <Widget>[
           TextButton(
-            child: Text("OK"),
+            child: const Text("OK"),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -161,7 +167,7 @@ showAlertDialog(context, title, message,
       barrierLabel: "Barrier",
       barrierDismissible: dismissible,
       barrierColor: Colors.black.withOpacity(0.5),
-      transitionDuration: Duration(milliseconds: 400),
+      transitionDuration: const Duration(milliseconds: 400),
       transitionBuilder: (_, anim, __, child) {
         var begin = 0.5;
         var end = 1.0;
@@ -184,18 +190,18 @@ showAlertDialog(context, title, message,
           },
           child: Center(
             child: Container(
-              margin: EdgeInsets.all(16),
+              margin: const EdgeInsets.all(16),
               child: SingleChildScrollView(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Material(
                     child: Container(
-                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                       color: Colors.white,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 4,
                           ),
                           Center(
@@ -204,12 +210,12 @@ showAlertDialog(context, title, message,
                               width: 50,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text(
-                            "${title}",
-                            style: TextStyle(
+                            "$title",
+                            style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           Padding(
@@ -224,7 +230,7 @@ showAlertDialog(context, title, message,
                                   onPressed: () {
                                     Navigator.of(alertContext).pop();
                                   },
-                                  child: Text("Cancel"),
+                                  child: const Text("Cancel"),
                                 ),
                               if (onPress != null)
                                 TextButton(
@@ -258,22 +264,29 @@ internetConnectivity() async {
   }
 }
 
-void sendSms(String message, String recipent) async {
-  SmsSender sender = new SmsSender();
-  String address ='+923116266746';
-  try{
-    SmsMessage message = new SmsMessage(address, 'Hello flutter world!');
-    message.onStateChanged.listen((state) {
-      if (state == SmsMessageState.Sent) {
-        print("SMS is sent!");
-      } else if (state == SmsMessageState.Delivered) {
-        print("SMS is delivered!");
-      }
-    });
-    sender.sendSms(message);
-  }catch(e){
-    debugPrint('sms error $e');
-  }
+void sendSms(String uri) async {
 
+  //const uri = 'sms:+923030266746?body=$message';
+  if (await canLaunch(uri)) {
+    await launch(uri);
+  } else {
+    // iOS
+    //const uri = 'sms:+923030266746?body=hello%20there';
+    if (await canLaunch(uri)) {
+      await launch(uri);
+    } else {
+      throw 'Could not launch $uri';
+    }
   }
+  return;
+  String message = "This is a test message!";
+  List<String> recipents = ["03030266746", "03116266746"];
+
+  String _result = await sendSMS(message: message, recipients: recipents)
+      .catchError((onError) {
+    print(onError);
+  });
+  print(_result);
+}
+
 

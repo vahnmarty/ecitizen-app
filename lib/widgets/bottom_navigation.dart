@@ -1,3 +1,4 @@
+import 'package:citizen/api/api.dart';
 import 'package:citizen/providers/news_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +46,7 @@ class BottomNavigation extends StatelessWidget {
               height: 60,
               child: RawMaterialButton(
                 onPressed: () {
-                  context.read<NewsProvider>().gettingNews();
+                  context.read<NewsProvider>().gettingNews(Apis.news);
                   Navigator.pushReplacement(
                       context, CustomRoute(builder: (context) => HomeScreen()));
                 },

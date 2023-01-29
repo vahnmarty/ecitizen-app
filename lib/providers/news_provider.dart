@@ -23,10 +23,10 @@ class NewsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  gettingNews() async {
+  gettingNews(String link) async {
     isGettingNews = true;
     List<News> list = [];
-    dynamic response = await ApiService().getRequest(Apis.news);
+    dynamic response = await ApiService().getRequest(link);
     //debugPrint('news: $response');
     if (response != null && response != '') {
       for (var i = 0; i < response.length; i++) {
