@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:citizen/constants/custom_route_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:open_mail_app/open_mail_app.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_sms/flutter_sms.dart';
+import 'package:background_sms/background_sms.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'dart:io';
@@ -264,29 +264,40 @@ internetConnectivity() async {
   }
 }
 
-void sendSms(String uri) async {
+Future<void> shareToFacebook(String link) async {
 
-  //const uri = 'sms:+923030266746?body=$message';
-  if (await canLaunch(uri)) {
-    await launch(uri);
+  final facebookShareLink =
+      'https://www.facebook.com/sharer/sharer.php?u=$link';
+  if (await canLaunch(facebookShareLink)) {
+    await launch(facebookShareLink);
   } else {
-    // iOS
-    //const uri = 'sms:+923030266746?body=hello%20there';
-    if (await canLaunch(uri)) {
-      await launch(uri);
-    } else {
-      throw 'Could not launch $uri';
-    }
+    throw 'Could not launch $facebookShareLink';
   }
-  return;
-  String message = "This is a test message!";
-  List<String> recipents = ["03030266746", "03116266746"];
+}
+Future<void> shareToTwitter(String link) async {
+  final String twitterLink = 'https://twitter.com/intent/tweet?text=Check%20out%20this%20news%20post:%20$link';
 
-  String _result = await sendSMS(message: message, recipients: recipents)
-      .catchError((onError) {
-    print(onError);
-  });
-  print(_result);
+  if (await canLaunch(twitterLink)) {
+    await launch(twitterLink);
+  } else {
+    throw 'Could not launch $twitterLink';
+  }
 }
 
 
+void sendSms(String message) async {
+  //String message = "This is a test message!";
+  List<String> recipients = ["03030266746", "03116266746"];
+  try{
+    final result = await BackgroundSms.sendMessage(
+        phoneNumber: "+639171073440", message: "$message");
+    if (result == SmsStatus.sent) {
+      print("Sent: $result");
+    } else {
+      print("Failed: $result");
+    }
+  }catch(e){
+    debugPrint('error sending message: $e');
+  }
+
+}

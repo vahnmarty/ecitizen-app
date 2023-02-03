@@ -13,15 +13,21 @@ class NewsAnnouncementsScreen extends StatefulWidget {
   const NewsAnnouncementsScreen({Key? key}) : super(key: key);
 
   @override
-  State<NewsAnnouncementsScreen> createState() => _NewsAnnouncementsScreenState();
+  State<NewsAnnouncementsScreen> createState() =>
+      _NewsAnnouncementsScreenState();
 }
 
 class _NewsAnnouncementsScreenState extends State<NewsAnnouncementsScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<NewsProvider>().gettingNews('${Apis.news}/?max=20');
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        context.read<NewsProvider>().gettingNews('${Apis.news}/?max=20');
+        });
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

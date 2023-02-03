@@ -26,7 +26,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../providers/news_provider.dart';
 import '../providers/services_provider.dart';
 import '../themes.dart';
@@ -44,6 +44,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
   //var _dropDownSelectedValue = _dropDownItems.first;
   _dropDownCallBack(String? id) {
@@ -55,6 +57,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   double gap = 6.0;
+
+  void _onRefresh() async {
+    await context.read<NewsProvider>().gettingNews(Apis.news);
+    await context.read<ServicesProvider>().getServices();
+    await context.read<AuthProvider>().checkUserSession();
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading(context) async {
+    NewsProvider newsProvider = Provider.of<NewsProvider>(context);
+    if (!newsProvider.isGettingNews) _refreshController.loadComplete();
+  }
 
   @override
   void initState() {
@@ -71,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.read<LocationProvider>().getCurrentLocation();
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.mainBg,
@@ -111,182 +126,186 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: const _BottomNavigation(),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.miniCenterDocked,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            //mainAxisAlignment: MainAxisAlignment.start,
-            //crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
-                child: Consumer<AuthProvider>(
-                  builder: (context, authProvider, child) {
-                    return authProvider.isLogin
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Hi, ${authProvider.user.name}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 22),
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    "${getTodayDate()}",
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                  Text(
-                                    "${getCurrentTime()}",
-                                    style: const TextStyle(fontSize: 12),
-                                  )
-                                ],
-                              ),
-                            ],
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Hi, ecitizen!',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 22),
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Row(
-                                    children: [
-                                      TextButton(
-                                          style: TextButton.styleFrom(
-                                              backgroundColor:
-                                                  AppColors.mainColor,
-                                              primary: Colors.white),
-                                          onPressed: () {
-                                            nextScreen(
-                                                context, const LoginScreen());
-                                          },
-                                          child: const Text('Login')),
-                                      const SizedBox(
-                                        width: 4,
-                                      ),
-                                      TextButton(
-                                          style: TextButton.styleFrom(
-                                              backgroundColor:
-                                                  AppColors.mainColor,
-                                              primary: Colors.white),
-                                          onPressed: () {
-                                            nextScreen(
-                                                context, const SignupScreen());
-                                          },
-                                          child: const Text('Signup')),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ],
-                          );
+      body: SmartRefresher(
+        onRefresh: _onRefresh,
+        onLoading: (){_onLoading(context);},
+        controller: _refreshController,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              //mainAxisAlignment: MainAxisAlignment.start,
+              //crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: Consumer<AuthProvider>(
+                    builder: (context, authProvider, child) {
+                      return authProvider.isLogin
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Hi, ${authProvider.user.name}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 22),
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      "${getTodayDate()}",
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                    Text(
+                                      "${getCurrentTime()}",
+                                      style: const TextStyle(fontSize: 12),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Hi, ecitizen!',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 22),
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        TextButton(
+                                            style: TextButton.styleFrom(
+                                                backgroundColor:
+                                                    AppColors.mainColor,
+                                                primary: Colors.white),
+                                            onPressed: () {
+                                              nextScreen(
+                                                  context, const LoginScreen());
+                                            },
+                                            child: const Text('Login')),
+                                        const SizedBox(
+                                          width: 4,
+                                        ),
+                                        TextButton(
+                                            style: TextButton.styleFrom(
+                                                backgroundColor:
+                                                    AppColors.mainColor,
+                                                primary: Colors.white),
+                                            onPressed: () {
+                                              nextScreen(
+                                                  context, const SignupScreen());
+                                            },
+                                            child: const Text('Signup')),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ],
+                            );
+                    },
+                  ),
+                ),
+                Consumer<ServicesProvider>(
+                  builder: (context, servicesProvider, child) {
+                    return servicesProvider.isLoading
+                        ? HomeScreenDropDown(
+                            callback: (String val) {
+                              debugPrint('selected $val');
+                            },
+                            list: _dropDownItems)
+                        : servicesProvider.services.isNotEmpty
+                            ? HomeScreenDropDown(
+                                list: servicesProvider.services,
+                                callback: _dropDownCallBack,
+                              )
+                            : const SizedBox();
                   },
                 ),
-              ),
-              Consumer<ServicesProvider>(
-                builder: (context, servicesProvider, child) {
-                  return servicesProvider.isLoading
-                      ? HomeScreenDropDown(
-                          callback: (String val) {
-                            debugPrint('selected $val');
+                Padding(
+                  padding: const EdgeInsets.only(top: 12, bottom: 6),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ReportCard(
+                          callback: () async {
+                            bool connected = await internetConnectivity();
+                            debugPrint('result: $connected');
+                            if (!connected) {
+                              nextScreen(context, ReportEmergencyScreen());
+                              return;
+                            }
+                            final token = await getToken();
+                            if (token == false || token == '' || token == null) {
+                              showAlertDialog(context, 'Login First',
+                                  'Please login to Continue',
+                                  showCancelButton: true,
+                                  dismissible: false,
+                                  okButtonText: 'Login', onPress: () {
+                                nextScreen(context, const LoginScreen());
+                              });
+                            } else {
+                              nextScreen(context, ReportEmergencyScreen());
+                            }
                           },
-                          list: _dropDownItems)
-                      : servicesProvider.services.isNotEmpty
-                          ? HomeScreenDropDown(
-                              list: servicesProvider.services,
-                              callback: _dropDownCallBack,
-                            )
-                          : const SizedBox();
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 6),
-                child: Row(
+                        ),
+                      ),
+                      SizedBox(
+                        width: gap,
+                      ),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            HotlinesCard(
+                              callback: () {
+                                nextScreen(
+                                    context, const EmergencyHotlinesScreen());
+                              },
+                            ),
+                            PaymentsCard(
+                              callBack: () {
+                                nextScreen(context, const OnlinePaymentsScreen());
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
                   children: [
                     Expanded(
-                      child: ReportCard(
-                        callback: () async {
-
-                          bool connected = await internetConnectivity();
-                          debugPrint('result: $connected');
-                          if (!connected) {
-                            nextScreen(context, ReportEmergencyScreen());
-                            return;
-                          }
-                          final token = await getToken();
-                          if (token == false || token == '' || token == null) {
-                            showAlertDialog(context, 'Login First',
-                                'Please login to Continue',
-                                showCancelButton: true,
-                                dismissible: false,
-                                okButtonText: 'Login', onPress: () {
-                              nextScreen(context, const LoginScreen());
-                            });
-                          } else {
-                            nextScreen(context, ReportEmergencyScreen());
-                          }
+                      child: ProfileOfficesCard(
+                        callback: () {
+                          nextScreen(context, const AboutScreen());
+                          //nextScreen(context, const LGUProfileScreen());
                         },
+                        isProfile: true,
                       ),
                     ),
                     SizedBox(
                       width: gap,
                     ),
                     Expanded(
-                      child: Column(
-                        children: [
-                          HotlinesCard(
-                            callback: () {
-                              nextScreen(
-                                  context, const EmergencyHotlinesScreen());
-                            },
-                          ),
-                          PaymentsCard(
-                            callBack: () {
-                              nextScreen(context, const OnlinePaymentsScreen());
-                            },
-                          ),
-                        ],
+                      child: ProfileOfficesCard(
+                        callback: () {
+                          nextScreen(context, const LGUOfficesScreen());
+                        },
+                        isProfile: false,
                       ),
                     ),
                   ],
                 ),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: ProfileOfficesCard(
-                      callback: () {
-                        nextScreen(context, const AboutScreen());
-                        //nextScreen(context, const LGUProfileScreen());
-                      },
-                      isProfile: true,
-                    ),
-                  ),
-                  SizedBox(
-                    width: gap,
-                  ),
-                  Expanded(
-                    child: ProfileOfficesCard(
-                      callback: () {
-                        nextScreen(context, const LGUOfficesScreen());
-                      },
-                      isProfile: false,
-                    ),
-                  ),
-                ],
-              ),
-              const NewsAndAnnouncementsWidget(),
-            ],
+                const NewsAndAnnouncementsWidget(),
+              ],
+            ),
           ),
         ),
       ),

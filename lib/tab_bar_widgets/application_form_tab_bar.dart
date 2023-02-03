@@ -16,45 +16,52 @@ class ApplicationFormTabBar extends StatelessWidget {
       padding: const EdgeInsets.only(top: 12.0, left: 12, right: 12),
       child: Consumer<ServicesProvider>(
         builder: (context, provider, child) {
-          return Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Application Form',
-                    style: cardHeadingStyle.copyWith(color: Colors.black),
+          return provider.isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.mainColor,
                   ),
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.mainColor),
-                      onPressed: () async {
-                        const url = "http://ecitizenph.com/storage/Application%20Form.pdf";
-                        final Uri _url = Uri.parse(url);
+                )
+              : Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Application Form',
+                          style: cardHeadingStyle.copyWith(color: Colors.black),
+                        ),
+                        ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.mainColor),
+                            onPressed: () async {
+                              const url =
+                                  "http://ecitizenph.com/storage/Application%20Form.pdf";
+                              final Uri _url = Uri.parse(url);
 
-                        await launchUrl(_url,
-                            mode: LaunchMode.externalApplication);
-                      },
-                      child: Text(
-                        'Download',
-                        style: TextStyle(color: Colors.white),
-                      )),
-                ],
-              ),
-              Expanded(
-                  child: Stack(
-                children: [
-                  const Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.mainColor,
+                              await launchUrl(_url,
+                                  mode: LaunchMode.externalApplication);
+                            },
+                            child: Text(
+                              'Download',
+                              style: TextStyle(color: Colors.white),
+                            )),
+                      ],
                     ),
-                  ),
-                  Image.network(
-                      '${provider.businessServiceModel.filePreviewUrl}')
-                ],
-              ))
-            ],
-          );
+                    Expanded(
+                        child: Stack(
+                      children: [
+                        const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.mainColor,
+                          ),
+                        ),
+                        Image.network(
+                            '${provider.businessServiceModel.filePreviewUrl}')
+                      ],
+                    ))
+                  ],
+                );
         },
       ),
     );

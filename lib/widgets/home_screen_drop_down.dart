@@ -60,7 +60,6 @@ class _HomeScreenDropDownState extends State<HomeScreenDropDown> {
           onChanged: (String? val) {
             _isSelected = true;
             _selectedValue = val!;
-
             widget.callback(widget.list.firstWhere((element) => element.name==val).id.toString());
             setState(() {});
           }),

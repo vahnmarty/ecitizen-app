@@ -24,67 +24,57 @@ class _ServiceScreenState extends State<ServiceScreen> {
   @override
   void initState() {
     super.initState();
-    if(mounted){
+    if (mounted) {
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
         context.read<ServicesProvider>().gettingBusinessServiceModel(widget.id);
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       initialIndex: 0,
       length: 3,
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: true,
-          title: const Hero(
-            tag: 'logo',
-            child: Image(
-              image: AssetImage('assets/logo/logo.png'),
-              height: 20,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            centerTitle: true,
+            title: const Hero(
+              tag: 'logo',
+              child: Image(
+                image: AssetImage('assets/logo/logo.png'),
+                height: 20,
+              ),
             ),
+            bottom: const TabBar(
+              tabs: [
+                Tab(
+                  text: 'Requirements',
+                ),
+                Tab(
+                  text: 'Procedures',
+                ),
+                Tab(
+                  text: 'Application Form',
+                ),
+              ],
+            ),
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.iconLightGrey,
+                )),
           ),
-          bottom: const TabBar(
-            tabs: [
-              Tab(
-                text: 'Requirements',
-              ),
-              Tab(
-                text: 'Procedures',
-              ),
-              Tab(
-                text: 'Application Form',
-              ),
-            ],
-          ),
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(
-                Icons.arrow_back,
-                color: AppColors.iconLightGrey,
-              )),
-        ),
-        body: Consumer<ServicesProvider>(
-          builder: (context, provider, child) {
-            return provider.isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.mainColor,
-                    ),
-                  )
-                : const TabBarView(children: [
-                    RequirementsTabBar(),
-                    ProceduresTabBar(),
-                    ApplicationFormTabBar()
-                  ]);
-          },
-        ),
-      ),
+          body: const TabBarView(children: [
+            RequirementsTabBar(),
+            ProceduresTabBar(),
+            ApplicationFormTabBar()
+          ])),
     );
   }
 }

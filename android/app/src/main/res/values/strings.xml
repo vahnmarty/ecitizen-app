@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="facebook_app_id">503891315005210</string>
+    <string name="fb_login_protocol_scheme">fb503891315005210</string>
+    <string name="facebook_client_token">ad5d06464cbccf8d7e2203d26cc5961a</string>
+    <string name="app_name">Ecitizen</string>
+</resources>

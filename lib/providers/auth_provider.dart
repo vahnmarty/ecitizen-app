@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:citizen/api/api.dart';
 import 'package:citizen/api/api_service.dart';
 import 'package:citizen/constants/constancts.dart';
@@ -20,13 +20,14 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  checkUserSession()async{
+  checkUserSession() async {
     final token = await getToken();
     if (token != '' || token != null) {
       //debugPrint('token found: $token');
       getUser(token);
     }
   }
+
   UserModel _user = UserModel();
 
   UserModel get user => _user;
@@ -34,7 +35,7 @@ class AuthProvider with ChangeNotifier {
   set user(UserModel value) {
     _user = value;
     setUser(value);
-    _isLogin=true;
+    _isLogin = true;
     notifyListeners();
   }
 
@@ -54,13 +55,13 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  login(dynamic data) async {
-    isLoading = true;
+  login(dynamic data, {bool showLoading = true}) async {
+    if (showLoading) isLoading = true;
     bool result = false;
     final response = await ApiService().postRequest("${Apis.login}", data);
     if (response != null) {
       if (response['status'] == 0) {
-        showToast(response['message']);
+        if (showLoading) showToast(response['message']);
         result = false;
       } else if (response['status'] == 1) {
         var token = response['token'];
@@ -69,19 +70,19 @@ class AuthProvider with ChangeNotifier {
         showToast(response['message']);
         result = true;
       } else {
-        showToast('Unable to proceed your request');
+        if (showLoading) showToast('Unable to proceed your request');
         result = false;
       }
     } else {
-      showToast('Unable to proceed your request');
+      if (showLoading) showToast('Unable to proceed your request');
       result = false;
     }
-    isLoading = false;
+    if (showLoading) isLoading = false;
     return result;
   }
 
-  signup(dynamic data) async {
-    isLoading = true;
+  signup(dynamic data, {bool showLoading = true}) async {
+    if (showLoading) isLoading = true;
     bool result = false;
     final response = await ApiService().postRequest("${Apis.signup}", data);
     //debugPrint('response $response');
@@ -97,17 +98,52 @@ class AuthProvider with ChangeNotifier {
           isLogin = true;
           getUser(token);
         } else {
-          showToast(response['errors'][0]);
+          if (showLoading) showToast(response['errors'][0]);
           result = false;
         }
       } catch (e) {
         debugPrint('error: $e');
-        showToast('Unable to register you!');
+        if (showLoading) showToast('Unable to register you!');
         result = false;
       }
     } else {
       //unable to procces your request
       result = false;
+    }
+    if (showLoading) isLoading = false;
+    return result;
+  }
+
+  loginWithFacebook() async {
+    isLoading = true;
+    bool result = false;
+    try {
+      final LoginResult fbLogin = await FacebookAuth.instance.login();
+      if (fbLogin.status == LoginStatus.success) {
+        final userData = await FacebookAuth.instance.getUserData();
+        if (userData != '' && userData != null) {
+          var data = {
+            "name": userData['name'],
+            "email": userData['email'],
+            "password": "12345678",
+            "password_confirmation": "12345678"
+          };
+          final signupResult = await signup(data, showLoading: false);
+          if (signupResult) {
+            result = true;
+          } else {
+            final loginResult = await login(data, showLoading: false);
+            if (loginResult) {
+              result = true;
+            } else {
+              showToast('Unable to Login you!');
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('error login=> $e');
+      showToast('Unable to Login you!');
     }
     isLoading = false;
     return result;

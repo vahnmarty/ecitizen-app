@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:location/location.dart' as loc;
+import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 class LocationProvider with ChangeNotifier {
@@ -7,15 +7,15 @@ class LocationProvider with ChangeNotifier {
   String lng = '';
   String address = '';
 
-
   getCurrentLocation() async {
-    var locationData = await gettingLoc();
+    var locationData = await gettingPosition();
+    //debugPrint('location data $locationData');
     if (locationData != null) {
       lat = locationData.latitude.toString();
       lng = locationData.longitude.toString();
       try {
         List<Placemark> placemarks = await placemarkFromCoordinates(
-            locationData.latitude!, locationData.longitude!);
+            locationData.latitude, locationData.longitude);
         if (placemarks.length > 0) {
           Placemark place = placemarks[0];
           //debugPrint('location: ${place.toString()}');
@@ -30,47 +30,27 @@ class LocationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<loc.LocationData?> gettingLoc() async {
+  Future<Position?> gettingPosition() async {
     try {
-      loc.Location location = new loc.Location();
-
-      bool _serviceEnabled;
-      loc.PermissionStatus _permissionGranted;
-      loc.LocationData _locationData;
-      print("inlocation function");
-
-      _serviceEnabled = await location.serviceEnabled();
-      if (!_serviceEnabled) {
-        print("inlocation function2");
-        _serviceEnabled = await location.requestService();
-        if (!_serviceEnabled) {
-          debugPrint('Location not Enabled!');
-          return null;
-        }
-      }
-
-      _permissionGranted = await location.hasPermission();
-      print("inlocation function3");
-      if (_permissionGranted == loc.PermissionStatus.denied) {
-        debugPrint('Permission Granted!');
-        _permissionGranted = await location.requestPermission();
-        if (_permissionGranted != loc.PermissionStatus.granted) {
-          debugPrint('Permission not granted!');
-          return null;
-        }
-      }
-      if (_permissionGranted == loc.PermissionStatus.denied) {
-        debugPrint('Permission Denied!');
+      bool serviceEnabled;
+      LocationPermission permission;
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
         return null;
       }
-      print("inlocation function4");
-
-      _locationData = await location.getLocation();
-      print(_locationData);
-      print("inlocation function5");
-      return _locationData;
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return null;
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        return null;
+      }
+      return await Geolocator.getCurrentPosition();
     } catch (e) {
-      print(e);
+      debugPrint('error while getting geolocation=> $e');
       return null;
     }
   }

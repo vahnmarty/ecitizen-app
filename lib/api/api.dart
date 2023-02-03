@@ -11,6 +11,7 @@ class Apis{
   static const reportEmergency = "report/emergency";
   static const directory = "directory";
   static const hotlines = "hotlines";
+  static const hotlinesCategories= "hotlines/categories?type=json";
 
 
 }

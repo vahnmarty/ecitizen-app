@@ -62,7 +62,9 @@ class NewsDetailScreen extends StatelessWidget {
                   ),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                      onPressed: () {},
+                      onPressed: () {
+                        shareToFacebook('http://ecitizenph.com/announcements/5-emergency-water-interruption');
+                      },
                       child: Row(children: const [
                         Image(
                           image: AssetImage('assets/icons/facebook.png'),
@@ -74,7 +76,9 @@ class NewsDetailScreen extends StatelessWidget {
                   const SizedBox(width: 8,),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                      onPressed: () {},
+                      onPressed: () {
+                        shareToTwitter('http://ecitizenph.com/announcements/5-emergency-water-interruption');
+                      },
                       child: const Image(
                         image: AssetImage('assets/icons/twitter.png'),
                         height: 16,

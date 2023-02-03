@@ -194,10 +194,11 @@ class ReportEmergencyScreen extends StatelessWidget {
                       : RaisedBtn(
                           title: 'Submit Report',
                           callback: () async {
+
                             bool connected = await internetConnectivity();
                             if (!connected) {
                               sendSms(
-                                  'sms:+639171073440?body=Type:${_selectedIndex + 1}, Address: ${_locationController.text}, Latitude: ${locProvider.lat}, Latitude: ${locProvider.lat}, Description: ${_descriptionController.text}');
+                                  'EmergencyType:${_selectedIndex + 1}, Address: ${_locationController.text}, Latitude: ${locProvider.lat}, Latitude: ${locProvider.lat}, Description: ${_descriptionController.text}');
                               //replaceScreen(context, HomeScreen());
                               return;
                             }

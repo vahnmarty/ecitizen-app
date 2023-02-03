@@ -3,6 +3,7 @@ import 'package:citizen/screens/home_screen.dart';
 import 'package:citizen/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,6 +18,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [...providers],
       child: MaterialApp(
+        localizationsDelegates: const [
+          RefreshLocalizations.delegate,
+        ],
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(

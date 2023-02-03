@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/src/material/dropdown.dart';
 import '../constants/constancts.dart';
+import '../models/hotline_categories_model.dart';
 import '../themes.dart';
 import '../widgets/bottom_navigation.dart';
 
@@ -17,14 +18,19 @@ class EmergencyHotlinesScreen extends StatefulWidget {
 }
 
 class _EmergencyHotlinesScreenState extends State<EmergencyHotlinesScreen> {
-  List<String> hotlineCategories = [
-    "All",
-    "Police Station",
-    "Fire Station",
-    "Medical Assistance",
-    "Red Cross",
-    "Local Government"
+  List<HotlineCategoryModel> hotlineCategories = [
+    HotlineCategoryModel(id: '-1', name: 'All'),
+    HotlineCategoryModel(id: '1', name: 'Police Station'),
+    HotlineCategoryModel(id: '2', name: 'Fire Station'),
   ];
+  HotlineCategoryModel selectedHotlineCategory =
+      HotlineCategoryModel(id: '-1', name: 'All');
+
+  _handleDropDownSelectedValue(HotlineCategoryModel val) {
+    setState(() {
+      selectedHotlineCategory = val;
+    });
+  }
 
   @override
   void initState() {
@@ -32,6 +38,7 @@ class _EmergencyHotlinesScreenState extends State<EmergencyHotlinesScreen> {
     if (mounted) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         context.read<HotlinesProvider>().getHotlines();
+        context.read<HotlinesProvider>().getHotlineCategories();
       });
     }
   }
@@ -60,17 +67,21 @@ class _EmergencyHotlinesScreenState extends State<EmergencyHotlinesScreen> {
               color: AppColors.iconLightGrey,
             )),
       ),
-      body: Column(
-        children: [
-          DropDownWidget(
-              list: hotlineCategories,
-              callback: (String val) {
-                debugPrint('selval: $val');
-              }),
-          Expanded(
-            child: Consumer<HotlinesProvider>(
-              builder: (context, provider, child) {
-                return provider.isLoading
+      body: Consumer<HotlinesProvider>(
+        builder: (context, provider, child) {
+          return Column(
+            children: [
+              provider.categoriesLoading
+                  ? DropDownWidget(
+                      list: hotlineCategories,
+                      callback: _handleDropDownSelectedValue)
+                  : DropDownWidget(
+                      list: provider.hotlineCategories.isEmpty
+                          ? hotlineCategories
+                          : provider.hotlineCategories,
+                      callback: _handleDropDownSelectedValue),
+              Expanded(
+                child: provider.isLoading
                     ? const Center(
                         child: CircularProgressIndicator(
                           color: AppColors.mainColor,
@@ -81,27 +92,19 @@ class _EmergencyHotlinesScreenState extends State<EmergencyHotlinesScreen> {
                         child: ListView.builder(
                             itemCount: provider.myHotlines.length,
                             itemBuilder: (context, index) {
-                              return _HotlinesListItem(
-                                  hotline: provider.myHotlines[index]);
+                              return selectedHotlineCategory.id=='-1'?_HotlinesListItem(
+                                  hotline: provider.myHotlines[index]): provider.myHotlines[index].hotlineCategory
+                                          .toString() ==
+                                      selectedHotlineCategory.id
+                                  ? _HotlinesListItem(
+                                      hotline: provider.myHotlines[index])
+                                  : const SizedBox();
                             }),
-                        /*child: GridView(
-                          physics: const BouncingScrollPhysics(),
-                          scrollDirection: Axis.vertical,
-                          gridDelegate:
-                              const SliverGridDelegateWithMaxCrossAxisExtent(
-                                  maxCrossAxisExtent: 200, mainAxisExtent: 240),
-                          children: [
-                            ...List.generate(
-                                provider.myHotlines.length,
-                                (index) => _HotlinesListItem(
-                                    hotline: provider.myHotlines[index])),
-                          ],
-                        ),*/
-                      );
-              },
-            ),
-          ),
-        ],
+                      ),
+              ),
+            ],
+          );
+        },
       ),
       bottomNavigationBar: const BottomNavigation(),
     );
@@ -154,7 +157,9 @@ class _HotlinesListItem extends StatelessWidget {
                   (index) => Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: TextButton(
-                          onPressed: (){makePhoneCall(hotline.numbers![index].number!);},
+                          onPressed: () {
+                            makePhoneCall(hotline.numbers![index].number!);
+                          },
                           child: IconsAndText(
                               text: hotline.numbers![index].number!,
                               icon: Icons.phone,
@@ -171,7 +176,7 @@ class _HotlinesListItem extends StatelessWidget {
 }
 
 class DropDownWidget extends StatefulWidget {
-  final List<String> list;
+  final List<HotlineCategoryModel> list;
   final Function callback;
 
   DropDownWidget({Key? key, required this.list, required this.callback})
@@ -182,15 +187,10 @@ class DropDownWidget extends StatefulWidget {
 }
 
 class _DropDownWidgetState extends State<DropDownWidget> {
-  String selectedValue = '';
-
-  bool init = false;
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    if (!init) {
-      selectedValue = widget.list.first;
-    }
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16, top: 16),
       child: Container(
@@ -207,7 +207,7 @@ class _DropDownWidgetState extends State<DropDownWidget> {
                   spreadRadius: 2),
             ]),
         child: DropdownButton(
-            value: selectedValue,
+            value: widget.list[selectedIndex],
             isExpanded: true,
             icon: const Icon(
               Icons.keyboard_arrow_down_rounded,
@@ -216,21 +216,29 @@ class _DropDownWidgetState extends State<DropDownWidget> {
             underline: Container(
               color: Colors.transparent,
             ),
-            items: widget.list.map<DropdownMenuItem<String>>((String val) {
+            items: widget.list.map<DropdownMenuItem<HotlineCategoryModel>>(
+                (HotlineCategoryModel val) {
               return DropdownMenuItem(
                   value: val,
                   child: Text(
-                    val,
+                    val.name!,
                     style: const TextStyle(fontWeight: FontWeight.w400),
                   ));
             }).toList(),
-            onChanged: (String? val) {
-              init = true;
-              selectedValue = val!;
+            onChanged: (HotlineCategoryModel? val) {
+              selectedIndex = getIndex(val!);
               widget.callback(val);
               setState(() {});
             }),
       ),
     );
+  }
+
+  getIndex(HotlineCategoryModel val) {
+    for (var i = 0; i < widget.list.length; i++) {
+      if (widget.list[i].id == val.id) {
+        return i;
+      }
+    }
   }
 }
