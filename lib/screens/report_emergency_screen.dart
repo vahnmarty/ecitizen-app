@@ -197,9 +197,18 @@ class ReportEmergencyScreen extends StatelessWidget {
 
                             bool connected = await internetConnectivity();
                             if (!connected) {
-                              sendSms(
+                              final result=sendSms(
                                   'EmergencyType:${_selectedIndex + 1}, Address: ${_locationController.text}, Latitude: ${locProvider.lat}, Latitude: ${locProvider.lat}, Description: ${_descriptionController.text}');
                               //replaceScreen(context, HomeScreen());
+                              if(result){
+                                showAlertDialog(context, 'Success',
+                                    'Your report has been submitted successfully!',
+                                    type: AlertType.SUCCESS,
+                                    okButtonText: 'Back to Home',
+                                    showCancelButton: false, onPress: () {
+                                      replaceScreen(context, HomeScreen());
+                                    });
+                              }
                               return;
                             }
                             final token = await getToken();

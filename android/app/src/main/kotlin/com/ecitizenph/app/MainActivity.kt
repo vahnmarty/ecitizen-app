@@ -1,4 +1,4 @@
-package com.ecitizen.citizen
+package com.ecitizenph.app
 
 import io.flutter.embedding.android.FlutterActivity
 

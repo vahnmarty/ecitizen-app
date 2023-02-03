@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "728375548933",
+    "project_id": "ecitizen-370316",
+    "storage_bucket": "ecitizen-370316.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:728375548933:android:2f8dcca3ccec5193bdd06c",
+        "android_client_info": {
+          "package_name": "com.ecitizenph.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "728375548933-nn2ps34f4ffiucofafhmb0mh18cu2qo0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnwojzcxnp_HA7tZNXmkJVS-3tICZPPZU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "728375548933-nn2ps34f4ffiucofafhmb0mh18cu2qo0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:728375548933:android:5f9e2326f9c6ee68bdd06c",
+        "android_client_info": {
+          "package_name": "com.ecitizenph.ecitizen"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "728375548933-nn2ps34f4ffiucofafhmb0mh18cu2qo0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnwojzcxnp_HA7tZNXmkJVS-3tICZPPZU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "728375548933-nn2ps34f4ffiucofafhmb0mh18cu2qo0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

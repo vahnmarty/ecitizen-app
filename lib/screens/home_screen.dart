@@ -22,6 +22,7 @@ import 'package:citizen/screens/service_screen.dart';
 import 'package:citizen/screens/signup_screen.dart';
 import 'package:citizen/widgets/home_screen_drop_down.dart';
 import 'package:citizen/widgets/rounded_center_button.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   //var _dropDownSelectedValue = _dropDownItems.first;
   _dropDownCallBack(String? id) {
@@ -79,6 +81,16 @@ class _HomeScreenState extends State<HomeScreen> {
         context.read<NewsProvider>().gettingNews(Apis.news);
         context.read<LocationProvider>().getCurrentLocation();
         context.read<AuthProvider>().checkUserSession();
+        _firebaseMessaging.getToken().then((String? token)async{
+          debugPrint('fcm token: $token');
+          assert(token !=null);
+          _firebaseMessaging.subscribeToTopic("all");
+          Function func = (tkn)async{
+            var request = {
+              'fcm_token':tkn,
+            };
+          };
+        });
       });
     }
   }

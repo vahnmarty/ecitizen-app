@@ -285,7 +285,7 @@ Future<void> shareToTwitter(String link) async {
 }
 
 
-void sendSms(String message) async {
+ sendSms(String message) async {
   //String message = "This is a test message!";
   List<String> recipients = ["03030266746", "03116266746"];
   try{
@@ -293,6 +293,7 @@ void sendSms(String message) async {
         phoneNumber: "+639171073440", message: "$message");
     if (result == SmsStatus.sent) {
       print("Sent: $result");
+      return true;
     } else {
       print("Failed: $result");
     }
@@ -301,3 +302,4 @@ void sendSms(String message) async {
   }
 
 }
+

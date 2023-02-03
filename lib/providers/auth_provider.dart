@@ -22,8 +22,8 @@ class AuthProvider with ChangeNotifier {
 
   checkUserSession() async {
     final token = await getToken();
-    if (token != '' || token != null) {
-      //debugPrint('token found: $token');
+    if (token && token != '' && token != null) {
+      debugPrint('token found: $token');
       getUser(token);
     }
   }
