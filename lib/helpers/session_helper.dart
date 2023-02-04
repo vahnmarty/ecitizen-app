@@ -42,6 +42,7 @@ getToken() async {
   }
 }
 
+
 logout() async {
   final prefs = await SharedPreferences.getInstance();
   try {

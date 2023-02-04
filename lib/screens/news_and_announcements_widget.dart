@@ -14,10 +14,21 @@ import '../widgets/news_item_list.dart';
 class NewsAndAnnouncementsWidget extends StatelessWidget {
   const NewsAndAnnouncementsWidget({Key? key}) : super(key: key);
 
+  _handleCachedData(provider) async {
+    bool connection = await internetConnectivity();
+    if (!connection) {
+      final news = await getNewsFromJson();
+      if (news != null) {
+        provider.newsList = news;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<NewsProvider>(
       builder: (context, newsProvider, child) {
+        _handleCachedData(newsProvider);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

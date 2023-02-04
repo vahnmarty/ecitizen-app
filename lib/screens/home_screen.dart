@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import '../config/config.dart';
 import '../providers/news_provider.dart';
 import '../providers/services_provider.dart';
 import '../themes.dart';
@@ -354,7 +355,7 @@ class _BottomNavigation extends StatelessWidget {
                   _BottomNavigationBarItem(
                     title: 'COVID',
                     callback: () {
-                      makePhoneCall('8888');
+                      makePhoneCall(Config.COVID_HOTLINE);
                     },
                   ),
                 ],
@@ -484,7 +485,7 @@ class _DrawerLayout extends StatelessWidget {
                   nextScreen(context, const AboutScreen());
                 },
               ),
-              ListTile(
+               ListTile(
                 title: const Text('M Y R E P O R T S'),
                 onTap: () async {
                   final token = await getToken();
@@ -492,9 +493,7 @@ class _DrawerLayout extends StatelessWidget {
                     Navigator.of(context).pop();
                     showAlertDialog(
                         context, 'Login First', 'Please login to Continue',
-                        showCancelButton: false, okButtonText: '', onPress: () {
-                      Navigator.of(context).pop();
-                    });
+                        showCancelButton: true);
                   } else {
                     Navigator.of(context).pop();
                     nextScreen(context, const MyReportsScreen());

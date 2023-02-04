@@ -4,6 +4,7 @@ import 'package:citizen/models/hotlines_model.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../api/api.dart';
+import '../constants/constancts.dart';
 
 class HotlinesProvider with ChangeNotifier {
   bool _isLoading = false;
@@ -51,6 +52,7 @@ class HotlinesProvider with ChangeNotifier {
         list.add(HotlinesModel.fromJson(response[i]));
       }
       myHotlines = list;
+      saveEmergencyHotlines(response);
     }
     isLoading = false;
   }

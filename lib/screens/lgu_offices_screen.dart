@@ -14,6 +14,15 @@ class LGUOfficesScreen extends StatefulWidget {
   @override
   State<LGUOfficesScreen> createState() => _LGUOfficesScreenState();
 }
+_handleCachedData(provider) async {
+  bool connection = await internetConnectivity();
+  if (!connection) {
+    final directories = await getLguOfficesDirectories();
+    if (directories != null) {
+      provider.myDirectories = directories;
+    }
+  }
+}
 
 class _LGUOfficesScreenState extends State<LGUOfficesScreen> {
   @override
@@ -22,6 +31,7 @@ class _LGUOfficesScreenState extends State<LGUOfficesScreen> {
     if (mounted) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         context.read<DirectoryProvider>().getDirectories();
+        _handleCachedData(context.read<DirectoryProvider>());
       });
     }
   }

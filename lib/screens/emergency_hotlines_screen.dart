@@ -31,6 +31,15 @@ class _EmergencyHotlinesScreenState extends State<EmergencyHotlinesScreen> {
       selectedHotlineCategory = val;
     });
   }
+  _handleCachedData(provider) async {
+    bool connection = await internetConnectivity();
+    if (!connection) {
+      final hotlines = await getEmergencyHotlines();
+      if (hotlines != null) {
+        provider.myHotlines = hotlines;
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -39,6 +48,7 @@ class _EmergencyHotlinesScreenState extends State<EmergencyHotlinesScreen> {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         context.read<HotlinesProvider>().getHotlines();
         context.read<HotlinesProvider>().getHotlineCategories();
+        _handleCachedData(context.read<HotlinesProvider>());
       });
     }
   }

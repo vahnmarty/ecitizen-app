@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:citizen/models/directory_model.dart';
+import 'package:citizen/providers/news_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -8,11 +10,16 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:open_mail_app/open_mail_app.dart';
 import 'package:intl/intl.dart';
 import 'package:background_sms/background_sms.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+
+import '../models/hotlines_model.dart';
+import '../models/news_model.dart';
 
 const cardHeadingStyle =
     TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.white);
@@ -253,7 +260,7 @@ showAlertDialog(context, title, message,
 
 internetConnectivity() async {
   try {
-    final result = await InternetAddress.lookup('example.com');
+    final result = await InternetAddress.lookup('https://www.google.com/');
     if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
       //print('connected');
       return true;
@@ -265,7 +272,6 @@ internetConnectivity() async {
 }
 
 Future<void> shareToFacebook(String link) async {
-
   final facebookShareLink =
       'https://www.facebook.com/sharer/sharer.php?u=$link';
   if (await canLaunch(facebookShareLink)) {
@@ -274,8 +280,10 @@ Future<void> shareToFacebook(String link) async {
     throw 'Could not launch $facebookShareLink';
   }
 }
+
 Future<void> shareToTwitter(String link) async {
-  final String twitterLink = 'https://twitter.com/intent/tweet?text=Check%20out%20this%20news%20post:%20$link';
+  final String twitterLink =
+      'https://twitter.com/intent/tweet?text=Check%20out%20this%20news%20post:%20$link';
 
   if (await canLaunch(twitterLink)) {
     await launch(twitterLink);
@@ -284,11 +292,10 @@ Future<void> shareToTwitter(String link) async {
   }
 }
 
-
- sendSms(String message) async {
+sendSms(String message) async {
   //String message = "This is a test message!";
   List<String> recipients = ["03030266746", "03116266746"];
-  try{
+  try {
     final result = await BackgroundSms.sendMessage(
         phoneNumber: "+639171073440", message: "$message");
     if (result == SmsStatus.sent) {
@@ -297,9 +304,71 @@ Future<void> shareToTwitter(String link) async {
     } else {
       print("Failed: $result");
     }
-  }catch(e){
+  } catch (e) {
     debugPrint('error sending message: $e');
   }
-
 }
 
+saveNewsJson(dynamic news) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString('news', jsonEncode(news));
+}
+
+getNewsFromJson() async {
+  List<News> list = [];
+  final prefs = await SharedPreferences.getInstance();
+  try {
+    final response = await jsonDecode(prefs.getString('news')!);
+    if (response.length != 0 && response != '' && response != null) {
+      for (var i = 0; i < response.length; i++) {
+        list.add(News.fromJson(response[i]));
+      }
+      return list;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+saveLguOfficesDirectories(dynamic directories) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString('lguDirectories', jsonEncode(directories));
+}
+
+getLguOfficesDirectories() async {
+  List<DirectoryModel> list = [];
+  final prefs = await SharedPreferences.getInstance();
+  try {
+    final response = await jsonDecode(prefs.getString('lguDirectories')!);
+    if (response.length != 0 && response != '' && response != null) {
+      for (var i = 0; i < response.length; i++) {
+        list.add(DirectoryModel.fromJson(response[i]));
+      }
+      return list;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+saveEmergencyHotlines(dynamic news) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString('saveEmergency', jsonEncode(news));
+}
+getEmergencyHotlines() async {
+  List<HotlinesModel> list = [];
+  final prefs = await SharedPreferences.getInstance();
+  try {
+    final response = await jsonDecode(prefs.getString('saveEmergency')!);
+    if (response.length != 0 && response != '' && response != null) {
+      for (var i = 0; i < response.length; i++) {
+        list.add(HotlinesModel.fromJson(response[i]));
+      }
+      return list;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}

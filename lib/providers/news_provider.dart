@@ -1,5 +1,6 @@
 import 'package:citizen/api/api.dart';
 import 'package:citizen/api/api_service.dart';
+import 'package:citizen/constants/constancts.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -33,6 +34,7 @@ class NewsProvider with ChangeNotifier {
         list.add(News.fromJson(response[i]));
       }
       newsList = list;
+      saveNewsJson(response);
     }
     isGettingNews = false;
   }

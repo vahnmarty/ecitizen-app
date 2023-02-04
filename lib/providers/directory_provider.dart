@@ -3,6 +3,8 @@ import 'package:citizen/api/api_service.dart';
 import 'package:citizen/models/directory_model.dart';
 import 'package:flutter/foundation.dart';
 
+import '../constants/constancts.dart';
+
 class DirectoryProvider with ChangeNotifier {
   bool _isLoading = false;
   List<DirectoryModel> _myDirectories = [];
@@ -30,7 +32,7 @@ class DirectoryProvider with ChangeNotifier {
         list.add(DirectoryModel.fromJson(response[i]));
       }
       myDirectories = list;
-
+      saveLguOfficesDirectories(list);
       //debugPrint('dl: ${myDirectories.length}');
     }
 
