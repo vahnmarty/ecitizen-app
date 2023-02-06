@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:citizen/api/api.dart';
 import 'package:citizen/models/directory_model.dart';
 import 'package:citizen/providers/news_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -294,7 +295,7 @@ Future<void> shareToTwitter(String link) async {
 
 sendSms(String message) async {
   //String message = "This is a test message!";
-  List<String> recipients = ["03030266746", "03116266746"];
+  //List<String> recipients = ["03030266746", "03116266746"];
   try {
     final result = await BackgroundSms.sendMessage(
         phoneNumber: "+639171073440", message: "$message");
@@ -370,5 +371,12 @@ getEmergencyHotlines() async {
     return null;
   } catch (e) {
     return null;
+  }
+}
+openWebView(String url)async{
+  url = '${Apis.APP_BASE_URL}$url';
+  debugPrint('url $url');
+  if(await canLaunchUrl(Uri.parse(url))){
+  launchUrl(Uri.parse(url));
   }
 }

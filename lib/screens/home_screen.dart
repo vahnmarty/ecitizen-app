@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
 import '../config/config.dart';
 import '../providers/news_provider.dart';
 import '../providers/services_provider.dart';
@@ -500,12 +501,46 @@ class _DrawerLayout extends StatelessWidget {
                   }
                 },
               ),
-              /*ListTile(
-                title: const Text('S E R V I C E S '),
+              ListTile(
+                title: const Text('C O N T A C T U S'),
+                onTap: () async{
+                  Navigator.of(context).pop();
+                  openWebView('contact');
+                  //nextScreen(context, const AboutScreen());
+                },
+              ),
+              ListTile(
+                title: const Text('D E V E L O P E R S '),
                 onTap: () {
                   Navigator.of(context).pop();
+                  openWebView('developers');
+                  //nextScreen(context, const AboutScreen());
                 },
-              ),*/
+              ),
+              ListTile(
+                title: const Text('F A Q '),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  openWebView('faq');
+                  //nextScreen(context, const AboutScreen());
+                },
+              ),
+              ListTile(
+                title: const Text('T E R M S '),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  openWebView('terms');
+                  //nextScreen(context, const AboutScreen());
+                },
+              ),
+              ListTile(
+                title: const Text('P R I V A C Y'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  openWebView('privacy');
+                  //nextScreen(context, const AboutScreen());
+                },
+              ),
               Container(
                 color: Colors.grey,
                 height: .5,
