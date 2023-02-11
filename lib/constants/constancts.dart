@@ -1,26 +1,27 @@
 import 'dart:convert';
 import 'package:citizen/api/api.dart';
+import 'package:citizen/config/config.dart';
 import 'package:citizen/models/directory_model.dart';
 import 'package:citizen/providers/news_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-
+import 'package:telephony/telephony.dart';
 import 'package:citizen/constants/custom_route_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:open_mail_app/open_mail_app.dart';
 import 'package:intl/intl.dart';
-import 'package:background_sms/background_sms.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
 import '../models/hotlines_model.dart';
 import '../models/news_model.dart';
+import '../screens/web_view_screen.dart';
 
 const cardHeadingStyle =
     TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.white);
@@ -261,13 +262,13 @@ showAlertDialog(context, title, message,
 
 internetConnectivity() async {
   try {
-    final result = await InternetAddress.lookup('https://www.google.com/');
-    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-      //print('connected');
-      return true;
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      return false;
     }
-  } on SocketException catch (_) {
-    //print('not connected');
+    return true;
+  } catch (e) {
+    debugPrint('connectivity error=> $e');
     return false;
   }
 }
@@ -293,21 +294,48 @@ Future<void> shareToTwitter(String link) async {
   }
 }
 
-sendSms(String message) async {
-  //String message = "This is a test message!";
-  //List<String> recipients = ["03030266746", "03116266746"];
-  try {
-    final result = await BackgroundSms.sendMessage(
-        phoneNumber: "+639171073440", message: "$message");
-    if (result == SmsStatus.sent) {
-      print("Sent: $result");
-      return true;
-    } else {
-      print("Failed: $result");
-    }
-  } catch (e) {
-    debugPrint('error sending message: $e');
+enum SMSSTATUS { SENT, NOTSENT, NOTCAPABLE, NOTGRANTED }
+
+final SmsSendStatusListener listener = (SendStatus status) {
+  if (status == SendStatus.SENT) {
+    return SMSSTATUS.SENT;
   }
+  return SMSSTATUS.NOTSENT;
+};
+openWebView(BuildContext context,String name){
+  nextScreen(context, WebViewScreen(pageName: name));
+}
+sendSms(String message) async {
+  debugPrint('in sent');
+  final Telephony telephony = Telephony.instance;
+  try{
+    bool? permissionGranted = await telephony.requestSmsPermissions;
+    debugPrint('sms persmi: $permissionGranted');
+    if (permissionGranted!) {
+      bool? capable = await telephony.isSmsCapable;
+      if (capable!) {
+
+        debugPrint('sms capable: $capable');
+        telephony.sendSms(
+            to: '${Config.SMS_NUMBER}',
+            message: message,
+            statusListener: (SendStatus status) {
+              if (status == SendStatus.SENT) {
+                return SMSSTATUS.SENT;
+              }
+
+            });
+      } else {
+        return SMSSTATUS.NOTCAPABLE;
+      }
+    } else {
+      return SMSSTATUS.NOTGRANTED;
+    }
+  }catch(e){
+    debugPrint('error sms permission=>$e');
+    return SMSSTATUS.NOTGRANTED;
+  }
+
 }
 
 saveNewsJson(dynamic news) async {
@@ -353,10 +381,12 @@ getLguOfficesDirectories() async {
     return null;
   }
 }
+
 saveEmergencyHotlines(dynamic news) async {
   final prefs = await SharedPreferences.getInstance();
   prefs.setString('saveEmergency', jsonEncode(news));
 }
+
 getEmergencyHotlines() async {
   List<HotlinesModel> list = [];
   final prefs = await SharedPreferences.getInstance();
@@ -371,12 +401,5 @@ getEmergencyHotlines() async {
     return null;
   } catch (e) {
     return null;
-  }
-}
-openWebView(String url)async{
-  url = '${Apis.APP_BASE_URL}$url';
-  debugPrint('url $url');
-  if(await canLaunchUrl(Uri.parse(url))){
-  launchUrl(Uri.parse(url));
   }
 }

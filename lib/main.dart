@@ -1,6 +1,7 @@
 import 'package:citizen/providers/providers.dart';
 import 'package:citizen/screens/home_screen.dart';
 import 'package:citizen/screens/login_screen.dart';
+import 'package:citizen/screens/search_service_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

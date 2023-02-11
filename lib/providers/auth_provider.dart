@@ -21,11 +21,16 @@ class AuthProvider with ChangeNotifier {
   }
 
   checkUserSession() async {
-    final token = await getToken();
-    if (token && token != '' && token != null) {
-      debugPrint('token found: $token');
-      getUser(token);
+    try{
+      final token = await getToken();
+      if (token != '' && token != null) {
+        debugPrint('token found: $token');
+        getUser(token);
+      }
+    }catch(e){
+      debugPrint('eror getting token=>$e');
     }
+
   }
 
   UserModel _user = UserModel();

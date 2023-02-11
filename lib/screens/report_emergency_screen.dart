@@ -12,6 +12,8 @@ import '../themes.dart';
 import '../widgets/bottom_navigation.dart';
 import '../widgets/raised_btn.dart';
 import '../widgets/upload_image_widget.dart';
+import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 
 final List<String> _emergencies = [
   'Fire',
@@ -28,7 +30,7 @@ class ReportEmergencyScreen extends StatelessWidget {
   final _descriptionController = TextEditingController();
   ValueNotifier<String> _selectedValue = ValueNotifier('Fire');
   bool _checked = true;
-
+  File? pickedImage;
   int _selectedIndex = 0;
 
   _handleSelectedIndex(int index) {
@@ -173,11 +175,15 @@ class ReportEmergencyScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 12.0),
                 child: Text(
-                  'Upload Photos (Optional)',
+                  'Upload Photo (Optional)',
                   style: _commonTextStyle,
                 ),
               ),
-              const UploadImageWidget(),
+              UploadImageWidget(
+                callback: (File? image) {
+                  pickedImage = image;
+                },
+              ),
               TermsCheckbox(
                 callBack: (bool val) {
                   _checked = val;
@@ -194,20 +200,57 @@ class ReportEmergencyScreen extends StatelessWidget {
                       : RaisedBtn(
                           title: 'Submit Report',
                           callback: () async {
-
                             bool connected = await internetConnectivity();
+                            debugPrint('connected: $connected');
                             if (!connected) {
-                              final result=sendSms(
-                                  'EmergencyType:${_selectedIndex + 1}, Address: ${_locationController.text}, Latitude: ${locProvider.lat}, Latitude: ${locProvider.lat}, Description: ${_descriptionController.text}');
+                              final result = await sendSms(
+                                  'type:${_selectedIndex + 1}, Adr: ${_locationController.text}, lat: ${locProvider.lat}, lng: ${locProvider.lng}, Des: ${_descriptionController.text}');
                               //replaceScreen(context, HomeScreen());
-                              if(result){
+                              debugPrint('sms result: $result');
+                              if (result == SMSSTATUS.SENT) {
                                 showAlertDialog(context, 'Success',
                                     'Your report has been submitted successfully!',
                                     type: AlertType.SUCCESS,
                                     okButtonText: 'Back to Home',
                                     showCancelButton: false, onPress: () {
-                                      replaceScreen(context, HomeScreen());
-                                    });
+                                  replaceScreen(context, HomeScreen());
+                                });
+                              } else if (result == SMSSTATUS.NOTGRANTED) {
+                                showAlertDialog(
+                                    context,
+                                    'Permission not Granted',
+                                    'You have not granted permisson to app to send sms! Please enable sms permission for app to work properly',
+                                    type: AlertType.WARNING,
+                                    okButtonText: 'Grant Permission',
+                                    showCancelButton: true, onPress: () async {
+                                  Navigator.of(context).pop();
+                                  openAppSettings();
+                                  debugPrint('ook');
+                                });
+                              } else if (result == SMSSTATUS.NOTCAPABLE) {
+                                showAlertDialog(context, 'Device Incompatible',
+                                    'Your device is incompatible to send sms in background',
+                                    type: AlertType.INFO,
+                                    showCancelButton: false,
+                                    okButtonText: 'Okay', onPress: () {
+                                  Navigator.of(context).pop();
+                                });
+                              } else if (result == SMSSTATUS.NOTSENT) {
+                                showAlertDialog(context, 'Sms Not Sent',
+                                    'Unable to send sms to emergency help line!',
+                                    type: AlertType.ERROR,
+                                    showCancelButton: false,
+                                    okButtonText: 'Okay', onPress: () {
+                                  Navigator.of(context).pop();
+                                });
+                              } else {
+                                showAlertDialog(
+                                    context, 'Sent', 'Sms Sent Successfully',
+                                    type: AlertType.SUCCESS,
+                                    showCancelButton: false,
+                                    okButtonText: 'Ok', onPress: () {
+                                  Navigator.of(context).pop();
+                                });
                               }
                               return;
                             }
@@ -237,17 +280,22 @@ class ReportEmergencyScreen extends StatelessWidget {
                               showToast('You have not enabled you location!');
                               return;
                             }
+                            debugPrint('image path: ${pickedImage}');
                             dynamic data = {
                               "type": "${_selectedIndex + 1}",
                               "description":
                                   _descriptionController.text.toString(),
                               "latitude": locProvider.lat.toString(),
                               "longitude": locProvider.lng.toString(),
-                              "address": _locationController.text.toString()
+                              "address": _locationController.text.toString(),
+                              "image": [
+                                pickedImage == null ? '' : pickedImage!.path
+                              ]
                             };
+                            //debugPrint('data: $data');
                             final res = await servicesProvider.reportEmergency(
                                 data, token);
-
+                            debugPrint('res: $res');
                             if (res == true) {
                               showAlertDialog(context, 'Success',
                                   'Your report has been submitted successfully!',

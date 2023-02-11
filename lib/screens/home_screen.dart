@@ -18,8 +18,10 @@ import 'package:citizen/screens/my_reports_screen.dart';
 import 'package:citizen/screens/news_and_announcements_widget.dart';
 import 'package:citizen/screens/online_payments_screen.dart';
 import 'package:citizen/screens/report_emergency_screen.dart';
+import 'package:citizen/screens/search_service_screen.dart';
 import 'package:citizen/screens/service_screen.dart';
 import 'package:citizen/screens/signup_screen.dart';
+import 'package:citizen/screens/web_view_screen.dart';
 import 'package:citizen/widgets/home_screen_drop_down.dart';
 import 'package:citizen/widgets/rounded_center_button.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -96,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
   }
+  int count = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -108,11 +111,21 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const Hero(
-          tag: 'logo',
-          child: Image(
-            image: AssetImage('assets/logo/logo.png'),
-            height: 20,
+        title: InkWell(
+          onTap: (){
+            count++;
+            if(count == 3){
+              showToast('You are just two steps away from developers page!');
+            }if(count == 5 || count>5){
+              openWebView(context,'developers');
+            }
+          },
+          child: const Hero(
+            tag: 'logo',
+            child: Image(
+              image: AssetImage('assets/logo/logo.png'),
+              height: 20,
+            ),
           ),
         ),
         actions: [
@@ -226,22 +239,41 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ),
-                Consumer<ServicesProvider>(
-                  builder: (context, servicesProvider, child) {
-                    return servicesProvider.isLoading
-                        ? HomeScreenDropDown(
-                            callback: (String val) {
-                              debugPrint('selected $val');
-                            },
-                            list: _dropDownItems)
-                        : servicesProvider.services.isNotEmpty
-                            ? HomeScreenDropDown(
-                                list: servicesProvider.services,
-                                callback: _dropDownCallBack,
-                              )
-                            : const SizedBox();
+                InkWell(
+                  onTap: (){
+                    nextScreen(context, const SearchSearchScreen());
                   },
+                  child: Container(
+                    padding:const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4)
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:const [
+                        Text('I want to apply for....',style: TextStyle(fontSize: 16),),
+                        Icon(Icons.keyboard_arrow_down,color: Colors.grey,),
+                      ],
+                    ),
+                  ),
                 ),
+                // Consumer<ServicesProvider>(
+                //   builder: (context, servicesProvider, child) {
+                //     return servicesProvider.isLoading
+                //         ? HomeScreenDropDown(
+                //             callback: (String val) {
+                //               debugPrint('selected $val');
+                //             },
+                //             list: _dropDownItems)
+                //         : servicesProvider.services.isNotEmpty
+                //             ? HomeScreenDropDown(
+                //                 list: servicesProvider.services,
+                //                 callback: _dropDownCallBack,
+                //               )
+                //             : const SizedBox();
+                //   },
+                // ),
                 Padding(
                   padding: const EdgeInsets.only(top: 12, bottom: 6),
                   child: Row(
@@ -250,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: ReportCard(
                           callback: () async {
                             bool connected = await internetConnectivity();
-                            debugPrint('result: $connected');
+                            debugPrint('conn: $connected');
                             if (!connected) {
                               nextScreen(context, ReportEmergencyScreen());
                               return;
@@ -431,6 +463,7 @@ class _BottomNavigationBarItem extends StatelessWidget {
 class _DrawerLayout extends StatelessWidget {
   const _DrawerLayout({Key? key}) : super(key: key);
 
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -483,7 +516,8 @@ class _DrawerLayout extends StatelessWidget {
                 title: const Text('A B O U T'),
                 onTap: () {
                   Navigator.of(context).pop();
-                  nextScreen(context, const AboutScreen());
+                  //nextScreen(context, const AboutScreen());
+                  openWebView(context, 'about');
                 },
               ),
                ListTile(
@@ -505,23 +539,22 @@ class _DrawerLayout extends StatelessWidget {
                 title: const Text('C O N T A C T U S'),
                 onTap: () async{
                   Navigator.of(context).pop();
-                  openWebView('contact');
+                  openWebView(context, 'contact');
                   //nextScreen(context, const AboutScreen());
                 },
               ),
-              ListTile(
-                title: const Text('D E V E L O P E R S '),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  openWebView('developers');
-                  //nextScreen(context, const AboutScreen());
-                },
-              ),
+              // ListTile(
+              //   title: const Text('D E V E L O P E R S '),
+              //   onTap: () {
+              //     Navigator.of(context).pop();
+              //     openWebView(context,'developers');
+              //   },
+              // ),
               ListTile(
                 title: const Text('F A Q '),
                 onTap: () {
                   Navigator.of(context).pop();
-                  openWebView('faq');
+                  openWebView(context,'faq');
                   //nextScreen(context, const AboutScreen());
                 },
               ),
@@ -529,7 +562,7 @@ class _DrawerLayout extends StatelessWidget {
                 title: const Text('T E R M S '),
                 onTap: () {
                   Navigator.of(context).pop();
-                  openWebView('terms');
+                  openWebView(context,'terms');
                   //nextScreen(context, const AboutScreen());
                 },
               ),
@@ -537,7 +570,7 @@ class _DrawerLayout extends StatelessWidget {
                 title: const Text('P R I V A C Y'),
                 onTap: () {
                   Navigator.of(context).pop();
-                  openWebView('privacy');
+                  openWebView(context,'privacy');
                   //nextScreen(context, const AboutScreen());
                 },
               ),

@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 class UploadImageWidget extends StatefulWidget {
-  const UploadImageWidget({Key? key}) : super(key: key);
+  final Function callback;
+  const UploadImageWidget({Key? key,required this.callback}) : super(key: key);
 
   @override
   State<UploadImageWidget> createState() => _UploadImageWidgetState();
@@ -75,6 +76,7 @@ class _UploadImageWidgetState extends State<UploadImageWidget> {
       if (image == null) return;
       final imageTemp = File(image.path);
       _image=imageTemp;
+      widget.callback(_image);
       setState(() {
 
       });
@@ -89,6 +91,7 @@ class _UploadImageWidgetState extends State<UploadImageWidget> {
       if (image == null) return;
       final imageTemp = File(image.path);
       _image =imageTemp;
+      widget.callback(_image);
       setState(() {
 
       });

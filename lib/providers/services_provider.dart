@@ -46,7 +46,6 @@ class ServicesProvider with ChangeNotifier {
     final response = await ApiService().getRequest('${Apis.services}');
     if (response != null && response != '') {
       for (var i = 0; i < response.length; i++) {
-        list.add(ServiceModel(id: '0',name: 'I want to apply for ...'));
         list.add(ServiceModel.fromJson(response[i]));
       }
       services = list;
@@ -56,8 +55,12 @@ class ServicesProvider with ChangeNotifier {
   reportEmergency(dynamic data,String token)async{
     bool result=false;
       isLoading=true;
-      final response =await ApiService().postRequest(Apis.reportEmergency, data,token: token);
-      debugPrint('res: $response');
+      //final response =await ApiService().postRequest(Apis.reportEmergency, data,token: token);
+      final response =await ApiService().multipartPostRequest(Apis.reportEmergency, data, token);
+      debugPrint('res0: $response');
+      if(response == 'null' || response ==null){
+        result=false;
+      }
       if(response !=null || response !=''){
         result=true;
       }else{

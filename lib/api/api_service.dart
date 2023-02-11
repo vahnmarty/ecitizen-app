@@ -49,4 +49,41 @@ class ApiService {
       client.close();
     }
   }
+
+  Future<dynamic?> multipartPostRequest(String url, Map data, token) async {
+    try {
+      Uri uri = Uri.parse('${Apis.BASE_URL}$url');
+      var request = http.MultipartRequest("POST", uri);
+      debugPrint('url: $uri');
+      request.fields['type'] = data['type'];
+      request.fields['description'] = data['description'];
+      request.fields['latitude'] = data['latitude'];
+      request.fields['longitude'] = data['longitude'];
+      request.fields['address'] = data['address'];
+
+      request.headers.addAll(
+          {"Authorization": "Bearer " + token, "Accept": "application/json"});
+
+      List<String?> imgPaths = data['image'];
+      dynamic result=null;
+      for (var path in imgPaths) {
+        request.files.add(await MultipartFile.fromPath('image', path!));
+
+        http.Response response =
+            await http.Response.fromStream(await request.send());
+
+        //print('myResponse ' + response.body.toString());
+        final hashMap = json.decode(response.body);
+        debugPrint('hashmap: $hashCode');
+        if (hashMap != '' && hashCode != null) {
+          result= hashMap;
+        }
+
+      }
+      return result;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    } finally {}
+  }
 }
