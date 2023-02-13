@@ -1,6 +1,6 @@
-class Apis{
+class Apis {
   static const APP_BASE_URL = "http://ecitizenph.com/";
-  static const BASE_URL = APP_BASE_URL+"api/";
+  static const BASE_URL = APP_BASE_URL + "api/";
   static const login = "login";
   static const signup = "signup";
   static const register = "register";
@@ -11,7 +11,6 @@ class Apis{
   static const reportEmergency = "report/emergency";
   static const directory = "directory";
   static const hotlines = "hotlines";
-  static const hotlinesCategories= "hotlines/categories?type=json";
-
-
+  static const hotlinesCategories = "hotlines/categories?type=json";
+  static const fcmToken = "fcm-token";
 }

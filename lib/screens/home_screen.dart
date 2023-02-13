@@ -20,6 +20,7 @@ import 'package:citizen/screens/online_payments_screen.dart';
 import 'package:citizen/screens/report_emergency_screen.dart';
 import 'package:citizen/screens/search_service_screen.dart';
 import 'package:citizen/screens/service_screen.dart';
+import 'package:citizen/screens/settings_screen.dart';
 import 'package:citizen/screens/signup_screen.dart';
 import 'package:citizen/screens/web_view_screen.dart';
 import 'package:citizen/widgets/home_screen_drop_down.dart';
@@ -94,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
               'fcm_token':tkn,
             };
           };
+          context.read<AuthProvider>().updateFcmToken(token!);
         });
       });
     }
@@ -572,6 +574,16 @@ class _DrawerLayout extends StatelessWidget {
                   Navigator.of(context).pop();
                   openWebView(context,'privacy');
                   //nextScreen(context, const AboutScreen());
+                },
+              ),
+              Container(
+                color: Colors.grey,
+                height: .5,
+              ),ListTile(
+                title: const Text('S E T T I N G S'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  nextScreen(context, const SettingsScreen());
                 },
               ),
               Container(

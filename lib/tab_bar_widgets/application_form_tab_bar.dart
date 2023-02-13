@@ -7,6 +7,8 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../api/api.dart';
+
 class ApplicationFormTabBar extends StatelessWidget {
   const ApplicationFormTabBar({Key? key}) : super(key: key);
 
@@ -35,9 +37,8 @@ class ApplicationFormTabBar extends StatelessWidget {
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.mainColor),
                             onPressed: () async {
-                              const url =
-                                  "http://ecitizenph.com/storage/Application%20Form.pdf";
-                              final Uri _url = Uri.parse(url);
+
+                              final Uri _url = Uri.parse(provider.businessServiceModel.applicationFormUrl!);
 
                               await launchUrl(_url,
                                   mode: LaunchMode.externalApplication);

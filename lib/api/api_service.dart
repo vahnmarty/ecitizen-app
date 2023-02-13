@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-import '../constants/constancts.dart';
 import 'api.dart';
 
 class ApiService {
@@ -65,7 +64,7 @@ class ApiService {
           {"Authorization": "Bearer " + token, "Accept": "application/json"});
 
       List<String?> imgPaths = data['image'];
-      dynamic result=null;
+      dynamic result = null;
       for (var path in imgPaths) {
         request.files.add(await MultipartFile.fromPath('image', path!));
 
@@ -76,14 +75,35 @@ class ApiService {
         final hashMap = json.decode(response.body);
         debugPrint('hashmap: $hashCode');
         if (hashMap != '' && hashCode != null) {
-          result= hashMap;
+          result = hashMap;
         }
-
       }
       return result;
     } catch (e) {
       print(e.toString());
       return null;
     } finally {}
+  }
+
+  Future<dynamic> patchRequest(String url, Map data,
+      {String token = ''}) async {
+    debugPrint('patch url ${Apis.BASE_URL}$url');
+
+    final Client client = http.Client();
+    try {
+      final Response response = await client
+          .patch(Uri.parse('${Apis.BASE_URL}$url'), body: data, headers: {
+        "Authorization": "Bearer " + token,
+        "Accept": "application/json"
+      });
+
+      final hashMap = jsonDecode(response.body);
+      return hashMap;
+    } catch (e) {
+      print(e.toString() + '=>$url');
+      return null;
+    } finally {
+      client.close();
+    }
   }
 }

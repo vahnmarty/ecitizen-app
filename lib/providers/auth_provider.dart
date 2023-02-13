@@ -1,13 +1,10 @@
-import 'dart:convert';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:citizen/api/api.dart';
 import 'package:citizen/api/api_service.dart';
 import 'package:citizen/constants/constancts.dart';
 import 'package:citizen/helpers/session_helper.dart';
 import 'package:citizen/models/user_model.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class AuthProvider with ChangeNotifier {
   bool _isLoading = false;
@@ -21,16 +18,15 @@ class AuthProvider with ChangeNotifier {
   }
 
   checkUserSession() async {
-    try{
+    try {
       final token = await getToken();
       if (token != '' && token != null) {
         debugPrint('token found: $token');
         getUser(token);
       }
-    }catch(e){
+    } catch (e) {
       debugPrint('eror getting token=>$e');
     }
-
   }
 
   UserModel _user = UserModel();
@@ -54,6 +50,7 @@ class AuthProvider with ChangeNotifier {
   getUser(String token) async {
     UserModel userModel = UserModel();
     final response = await ApiService().getRequest(Apis.user, token: token);
+    //debugPrint('us res: $response');
     if (response != null) {
       userModel = UserModel.fromJson(response);
       user = userModel;
@@ -152,5 +149,21 @@ class AuthProvider with ChangeNotifier {
     }
     isLoading = false;
     return result;
+  }
+
+  updateFcmToken(String fcmToken) async {
+    try {
+      final sessionToken = await getToken();
+      //debugPrint("ses: $sessionToken");
+      if (sessionToken != '' &&
+          sessionToken != null &&
+          sessionToken != false) {
+        dynamic data={"token":fcmToken};
+        final response =await ApiService().patchRequest(Apis.fcmToken, data,token: sessionToken);
+        debugPrint("fcm res: $response");
+      }
+    } catch (e) {
+      debugPrint('getting session token in update fcm func=> $e');
+    }
   }
 }
