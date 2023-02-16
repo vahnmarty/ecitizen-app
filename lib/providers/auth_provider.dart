@@ -9,6 +9,10 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 class AuthProvider with ChangeNotifier {
   bool _isLoading = false;
   bool _isLogin = false;
+  bool smsAnnouncement = false;
+  bool smsReport = true;
+  bool notificationAnnouncement = true;
+  bool notificationReport = true;
 
   bool get isLogin => _isLogin;
 
@@ -155,15 +159,78 @@ class AuthProvider with ChangeNotifier {
     try {
       final sessionToken = await getToken();
       //debugPrint("ses: $sessionToken");
-      if (sessionToken != '' &&
-          sessionToken != null &&
-          sessionToken != false) {
-        dynamic data={"token":fcmToken};
-        final response =await ApiService().patchRequest(Apis.fcmToken, data,token: sessionToken);
+      if (sessionToken != '' && sessionToken != null && sessionToken != false) {
+        dynamic data = {"token": fcmToken};
+        final response = await ApiService()
+            .patchRequest(Apis.fcmToken, data, token: sessionToken);
         debugPrint("fcm res: $response");
       }
     } catch (e) {
       debugPrint('getting session token in update fcm func=> $e');
+    }
+  }
+
+  getNotificationSettings() async {
+    isLoading = true;
+    try {
+      final sessionToken = await getToken();
+      //debugPrint("ses: $sessionToken");
+      if (sessionToken != '' && sessionToken != null && sessionToken != false) {
+        final response = await ApiService()
+            .getRequest(Apis.notification, token: sessionToken);
+        //final response =await ApiService().patchRequest(Apis.notification, data,token: sessionToken);
+        if (response != null && response != '') {
+          if (response['notification_report'] == 1) {
+            notificationReport = true;
+          } else {
+            notificationReport = false;
+          }
+          if (response['notification_announcement'] == 1) {
+            notificationAnnouncement = true;
+          } else {
+            notificationAnnouncement = false;
+          }
+          if (response['sms_notification_report'] == 1) {
+            smsReport = true;
+          } else {
+            smsReport = false;
+          }
+          if (response['sms_notification_announcement'] == 1) {
+            smsAnnouncement = true;
+          } else {
+            smsAnnouncement = false;
+          }
+        }
+        debugPrint('notificationsettings: $response');
+
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('getting session token in update fcm func=> $e');
+    }
+    isLoading = false;
+  }
+
+  saveNotificationSettings() async {
+    dynamic data = {
+      "notification_report": "$notificationReport",
+      "notification_announcement": "$notificationAnnouncement",
+      "sms_notification_report": "$smsReport",
+      "sms_notification_announcement": "$smsAnnouncement"
+    };
+
+    debugPrint('data: $data');
+    try {
+      final sessionToken = await getToken();
+
+      if (sessionToken != '' && sessionToken != null && sessionToken != false) {
+        final response = await ApiService()
+            .patchRequest(Apis.notificationSettings, data, token: sessionToken);
+        debugPrint("save notification settings res: $response");
+        showToast("$response");
+      }
+    } catch (e) {
+      debugPrint('getting session token in save notification error=> $e');
     }
   }
 }

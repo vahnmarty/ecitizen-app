@@ -13,4 +13,6 @@ class Apis {
   static const hotlines = "hotlines";
   static const hotlinesCategories = "hotlines/categories?type=json";
   static const fcmToken = "fcm-token";
+  static const notificationSettings = "notification/settings";
+  static const notification = "notification";
 }
