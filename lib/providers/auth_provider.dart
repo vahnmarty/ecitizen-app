@@ -201,7 +201,7 @@ class AuthProvider with ChangeNotifier {
             smsAnnouncement = false;
           }
         }
-        debugPrint('notificationsettings: $response');
+        //debugPrint('notificationsettings: $response');
 
         notifyListeners();
       }
@@ -211,23 +211,16 @@ class AuthProvider with ChangeNotifier {
     isLoading = false;
   }
 
-  saveNotificationSettings() async {
-    dynamic data = {
-      "notification_report": "$notificationReport",
-      "notification_announcement": "$notificationAnnouncement",
-      "sms_notification_report": "$smsReport",
-      "sms_notification_announcement": "$smsAnnouncement"
-    };
-
-    debugPrint('data: $data');
+  saveNotificationSettings(dynamic data) async {
+    //debugPrint('data: $data');
     try {
       final sessionToken = await getToken();
 
       if (sessionToken != '' && sessionToken != null && sessionToken != false) {
         final response = await ApiService()
             .patchRequest(Apis.notificationSettings, data, token: sessionToken);
-        debugPrint("save notification settings res: $response");
-        showToast("$response");
+        //debugPrint("save notification settings res: $response");
+        //showToast("$response");
       }
     } catch (e) {
       debugPrint('getting session token in save notification error=> $e');

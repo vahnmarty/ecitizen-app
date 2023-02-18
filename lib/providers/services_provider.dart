@@ -52,13 +52,19 @@ class ServicesProvider with ChangeNotifier {
     }
     isLoading = false;
   }
-  reportEmergency(dynamic data,String token)async{
+  reportEmergency(dynamic data,String token,bool withImage)async{
     bool result=false;
       isLoading=true;
-      //final response =await ApiService().postRequest(Apis.reportEmergency, data,token: token);
-      final response =await ApiService().multipartPostRequest(Apis.reportEmergency, data, token);
+      dynamic response;
+      if(withImage){
+        debugPrint('with image');
+        response =await ApiService().multipartPostRequest(Apis.reportEmergency, data, token);
+      }else{
+        debugPrint('no image');
+        response =await ApiService().postRequest(Apis.reportEmergency, data,token: token);
+      }
       debugPrint('res0: $response');
-      if(response == 'null' || response ==null){
+      if(response == null || response =='null'){
         result=false;
       }
       if(response !=null || response !=''){

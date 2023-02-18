@@ -64,7 +64,7 @@ class ApiService {
           {"Authorization": "Bearer " + token, "Accept": "application/json"});
 
       List<String?> imgPaths = data['image'];
-      dynamic result = null;
+      dynamic result;
       for (var path in imgPaths) {
         request.files.add(await MultipartFile.fromPath('image', path!));
 
@@ -73,7 +73,7 @@ class ApiService {
 
         //print('myResponse ' + response.body.toString());
         final hashMap = json.decode(response.body);
-        debugPrint('hashmap: $hashCode');
+        //debugPrint('hashmap: $hashCode');
         if (hashMap != '' && hashCode != null) {
           result = hashMap;
         }
@@ -87,7 +87,7 @@ class ApiService {
 
   Future<dynamic> patchRequest(String url, Map data,
       {String token = ''}) async {
-    debugPrint('patch url ${Apis.BASE_URL}$url');
+    //debugPrint('patch url ${Apis.BASE_URL}$url');
 
     final Client client = http.Client();
     try {

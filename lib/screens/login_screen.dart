@@ -98,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                             title: 'Login'),
                     const SizedBox(height: 10),
-                    !provider.isLoading? Padding(
+                    /*!provider.isLoading? Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ],
                           )),
-                    ):SizedBox(),
+                    ):SizedBox(),*/
                     TextButton(
                       onPressed: () {
                         nextScreen(context, const SignupScreen());

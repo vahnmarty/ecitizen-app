@@ -1,4 +1,3 @@
-import 'package:citizen/constants/constancts.dart';
 import 'package:citizen/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -46,19 +45,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: AppColors.iconLightGrey,
             )),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: IconButton(
-              icon: const Icon(
-                Icons.save,
-                color: AppColors.iconLightGrey,
-              ),
-              onPressed: () async{
-                await context.read<AuthProvider>().saveNotificationSettings();
-                //showToast('Notification Settings Saved.');
-              },
-            ),
-          )
+          // Padding(
+          //   padding: const EdgeInsets.only(right: 12),
+          //   child: IconButton(
+          //     icon: const Icon(
+          //       Icons.save,
+          //       color: AppColors.iconLightGrey,
+          //     ),
+          //     onPressed: () async{
+          //
+          //       //showToast('Notification Settings Saved.');
+          //     },
+          //   ),
+          // )
         ],
       ),
       body: Padding(
@@ -89,9 +88,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Switch.adaptive(
                               activeColor: AppColors.cardGreenLight,
                               value: provider.smsAnnouncement,
-                              onChanged: (val) {
+                              onChanged: (val) async {
                                 provider.smsAnnouncement = val;
+                                dynamic data = {
+                                  "key": "sms_notification_announcement",
+                                  "value": val?'1':'0'
+                                };
                                 setState(() {});
+                                await context
+                                    .read<AuthProvider>()
+                                    .saveNotificationSettings(data);
+
                               }),
                         ],
                       ),
@@ -105,9 +112,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Switch.adaptive(
                               activeColor: AppColors.cardGreenLight,
                               value: provider.smsReport,
-                              onChanged: (val) {
+                              onChanged: (val) async{
                                 provider.smsReport = val;
+                                dynamic data = {
+                                  "key": "sms_notification_report",
+                                  "value": val?'1':'0'
+                                };
                                 setState(() {});
+                                await context
+                                    .read<AuthProvider>()
+                                    .saveNotificationSettings(data);
+
                               }),
                         ],
                       ),
@@ -132,9 +147,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Switch.adaptive(
                               activeColor: AppColors.cardGreenLight,
                               value: provider.notificationReport,
-                              onChanged: (val) {
+                              onChanged: (val) async{
                                 provider.notificationReport = val;
+                                dynamic data = {
+                                  "key": "notification_report",
+                                  "value": val?'1':'0'
+                                };
                                 setState(() {});
+                                await context
+                                    .read<AuthProvider>()
+                                    .saveNotificationSettings(data);
+
                               }),
                         ],
                       ),
@@ -148,9 +171,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Switch.adaptive(
                               activeColor: AppColors.cardGreenLight,
                               value: provider.notificationAnnouncement,
-                              onChanged: (val) {
+                              onChanged: (val) async{
                                 provider.notificationAnnouncement = val;
+                                dynamic data = {
+                                  "key": "notification_announcement",
+                                  "value": val?'1':'0'
+                                };
                                 setState(() {});
+                                await context
+                                    .read<AuthProvider>()
+                                    .saveNotificationSettings(data);
+
                               }),
                         ],
                       ),

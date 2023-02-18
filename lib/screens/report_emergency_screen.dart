@@ -1,10 +1,11 @@
+import 'dart:io';
+
 import 'package:citizen/constants/constancts.dart';
 import 'package:citizen/providers/location_provider.dart';
 import 'package:citizen/providers/services_provider.dart';
 import 'package:citizen/screens/home_screen.dart';
-import 'package:citizen/screens/login_screen.dart';
-import 'package:citizen/widgets/rounded_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../helpers/session_helper.dart';
@@ -12,8 +13,6 @@ import '../themes.dart';
 import '../widgets/bottom_navigation.dart';
 import '../widgets/raised_btn.dart';
 import '../widgets/upload_image_widget.dart';
-import 'dart:io';
-import 'package:permission_handler/permission_handler.dart';
 
 final List<String> _emergencies = [
   'Fire',
@@ -280,21 +279,24 @@ class ReportEmergencyScreen extends StatelessWidget {
                               showToast('You have not enabled you location!');
                               return;
                             }
-                            debugPrint('image path: ${pickedImage}');
+                            debugPrint('image path: $pickedImage');
+                            bool withImage=false;
                             dynamic data = {
                               "type": "${_selectedIndex + 1}",
                               "description":
-                                  _descriptionController.text.toString(),
+                              _descriptionController.text.toString(),
                               "latitude": locProvider.lat.toString(),
                               "longitude": locProvider.lng.toString(),
                               "address": _locationController.text.toString(),
-                              "image": [
-                                pickedImage == null ? '' : pickedImage!.path
-                              ]
+                              "useragent": await getDeviceInfo(),
                             };
+                            if (pickedImage != null) {
+                              data["image"] = [pickedImage!.path];
+                              withImage=true;
+                            }
                             //debugPrint('data: $data');
                             final res = await servicesProvider.reportEmergency(
-                                data, token);
+                                data, token, withImage);
                             debugPrint('res: $res');
                             if (res == true) {
                               showAlertDialog(context, 'Success',
