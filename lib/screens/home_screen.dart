@@ -6,25 +6,19 @@ import 'package:citizen/cards/report_card.dart';
 import 'package:citizen/constants/constancts.dart';
 import 'package:citizen/helpers/session_helper.dart';
 import 'package:citizen/models/service_model.dart';
-import 'package:citizen/models/user_model.dart';
 import 'package:citizen/providers/auth_provider.dart';
 import 'package:citizen/providers/location_provider.dart';
 import 'package:citizen/screens/LGU_offices_screen.dart';
 import 'package:citizen/screens/about_screen.dart';
 import 'package:citizen/screens/emergency_hotlines_screen.dart';
-import 'package:citizen/screens/lgu_profile_screen.dart';
 import 'package:citizen/screens/login_screen.dart';
 import 'package:citizen/screens/my_reports_screen.dart';
 import 'package:citizen/screens/news_and_announcements_widget.dart';
-import 'package:citizen/screens/online_payments_screen.dart';
 import 'package:citizen/screens/report_emergency_screen.dart';
 import 'package:citizen/screens/search_service_screen.dart';
 import 'package:citizen/screens/service_screen.dart';
 import 'package:citizen/screens/settings_screen.dart';
 import 'package:citizen/screens/signup_screen.dart';
-import 'package:citizen/screens/web_view_screen.dart';
-import 'package:citizen/widgets/home_screen_drop_down.dart';
-import 'package:citizen/widgets/rounded_center_button.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -86,21 +80,21 @@ class _HomeScreenState extends State<HomeScreen> {
         context.read<NewsProvider>().gettingNews(Apis.news);
         context.read<LocationProvider>().getCurrentLocation();
         context.read<AuthProvider>().checkUserSession();
-        _firebaseMessaging.getToken().then((String? token)async{
+        _firebaseMessaging.getToken().then((String? token) async {
           debugPrint('fcm token: $token');
-          assert(token !=null);
+          assert(token != null);
           _firebaseMessaging.subscribeToTopic("all");
-          Function func = (tkn)async{
+          Function func = (tkn) async {
             var request = {
-              'fcm_token':tkn,
+              'fcm_token': tkn,
             };
           };
           context.read<AuthProvider>().updateFcmToken(token!);
         });
-
       });
     }
   }
+
   int count = 0;
 
   @override
@@ -115,12 +109,13 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         centerTitle: true,
         title: InkWell(
-          onTap: (){
+          onTap: () {
             count++;
-            if(count == 3){
+            if (count == 3) {
               showToast('You are just two steps away from developers page!');
-            }if(count == 5 || count>5){
-              openWebView(context,'developers');
+            }
+            if (count == 5 || count > 5) {
+              openWebView(context, 'developers');
             }
           },
           child: const Hero(
@@ -132,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          Padding(
+          /*Padding(
             padding: const EdgeInsets.only(right: 12),
             child: IconButton(
               icon: const Icon(
@@ -141,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               onPressed: () {},
             ),
-          )
+          )*/
         ],
         leading: IconButton(
             onPressed: () {
@@ -158,7 +153,9 @@ class _HomeScreenState extends State<HomeScreen> {
           FloatingActionButtonLocation.miniCenterDocked,
       body: SmartRefresher(
         onRefresh: _onRefresh,
-        onLoading: (){_onLoading(context);},
+        onLoading: () {
+          _onLoading(context);
+        },
         controller: _refreshController,
         child: SingleChildScrollView(
           child: Padding(
@@ -178,7 +175,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Text(
                                   'Hi, ${authProvider.user.name}',
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 22),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 22),
                                 ),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -202,7 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 const Text(
                                   'Hi, ecitizen!',
                                   style: TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 22),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 22),
                                 ),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -229,8 +228,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     AppColors.mainColor,
                                                 primary: Colors.white),
                                             onPressed: () {
-                                              nextScreen(
-                                                  context, const SignupScreen());
+                                              nextScreen(context,
+                                                  const SignupScreen());
                                             },
                                             child: const Text('Signup')),
                                       ],
@@ -243,20 +242,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 InkWell(
-                  onTap: (){
+                  onTap: () {
                     nextScreen(context, const SearchSearchScreen());
                   },
                   child: Container(
-                    padding:const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4)
-                    ),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children:const [
-                        Text('I want to apply for....',style: TextStyle(fontSize: 16),),
-                        Icon(Icons.keyboard_arrow_down,color: Colors.grey,),
+                      children: const [
+                        Text(
+                          'I want to apply for....',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Colors.grey,
+                        ),
                       ],
                     ),
                   ),
@@ -291,7 +295,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               return;
                             }
                             final token = await getToken();
-                            if (token == false || token == '' || token == null) {
+                            if (token == false ||
+                                token == '' ||
+                                token == null) {
                               showAlertDialog(context, 'Login First',
                                   'Please login to Continue',
                                   showCancelButton: true,
@@ -319,7 +325,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             PaymentsCard(
                               callBack: () {
-                                nextScreen(context, const OnlinePaymentsScreen());
+                                showAlertDialog(context, 'Option not Available',
+                                    'Sorry, this feature is not available at the moment!',type: AlertType.WARNING);
+
+                                //nextScreen(context, const OnlinePaymentsScreen());
                               },
                             ),
                           ],
@@ -466,7 +475,6 @@ class _BottomNavigationBarItem extends StatelessWidget {
 class _DrawerLayout extends StatelessWidget {
   const _DrawerLayout({Key? key}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -523,8 +531,8 @@ class _DrawerLayout extends StatelessWidget {
                   openWebView(context, 'about');
                 },
               ),
-               ListTile(
-                title: const Text('M Y R E P O R T S'),
+              ListTile(
+                title: const Text('M Y  -R E P O R T S'),
                 onTap: () async {
                   final token = await getToken();
                   if (token == false || token == null || token == '') {
@@ -539,8 +547,8 @@ class _DrawerLayout extends StatelessWidget {
                 },
               ),
               ListTile(
-                title: const Text('C O N T A C T U S'),
-                onTap: () async{
+                title: const Text('C O N T A C T  -U S'),
+                onTap: () async {
                   Navigator.of(context).pop();
                   openWebView(context, 'contact');
                   //nextScreen(context, const AboutScreen());
@@ -557,7 +565,7 @@ class _DrawerLayout extends StatelessWidget {
                 title: const Text('F A Q '),
                 onTap: () {
                   Navigator.of(context).pop();
-                  openWebView(context,'faq');
+                  openWebView(context, 'faq');
                   //nextScreen(context, const AboutScreen());
                 },
               ),
@@ -565,7 +573,7 @@ class _DrawerLayout extends StatelessWidget {
                 title: const Text('T E R M S '),
                 onTap: () {
                   Navigator.of(context).pop();
-                  openWebView(context,'terms');
+                  openWebView(context, 'terms');
                   //nextScreen(context, const AboutScreen());
                 },
               ),
@@ -573,14 +581,15 @@ class _DrawerLayout extends StatelessWidget {
                 title: const Text('P R I V A C Y'),
                 onTap: () {
                   Navigator.of(context).pop();
-                  openWebView(context,'privacy');
+                  openWebView(context, 'privacy');
                   //nextScreen(context, const AboutScreen());
                 },
               ),
               Container(
                 color: Colors.grey,
                 height: .5,
-              ),ListTile(
+              ),
+              ListTile(
                 title: const Text('S E T T I N G S'),
                 onTap: () {
                   Navigator.of(context).pop();

@@ -31,7 +31,7 @@ class OnlinePaymentsScreen extends StatelessWidget {
       ),
       body: Center(
         child: Text(
-          'Online \nPayments',
+          'Sorry, this feature is not available at the moment!',
           style: cardHeadingStyle.copyWith(color: Colors.black),
         ),
       ),

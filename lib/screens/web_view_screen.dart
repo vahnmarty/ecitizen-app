@@ -11,6 +11,7 @@ class WebViewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var url = '${Apis.APP_BASE_URL}$pageName?view=mobile';
+    //debugPrint('url => $url');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,

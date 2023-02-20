@@ -1,5 +1,6 @@
 import 'package:citizen/screens/home_screen.dart';
 import 'package:citizen/screens/signup_screen.dart';
+import 'package:citizen/screens/web_view_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -71,7 +72,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       obscureText: true,
                       controller: _passwordController,
                     ),
-                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding:const EdgeInsets.only(right: 8),
+                          child: TextButton(
+                            onPressed: () {
+                              nextScreen(context, const WebViewScreen(pageName: 'forgot-password'));
+                            },
+                            child: const Text(
+                              'Forgot Password?',
+                              style: TextStyle(color: AppColors.mainColor),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    //const SizedBox(height: 10),
                     provider.isLoading
                         ? const Center(
                             child: CircularProgressIndicator(
