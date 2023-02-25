@@ -30,6 +30,7 @@ import '../config/config.dart';
 import '../providers/news_provider.dart';
 import '../providers/services_provider.dart';
 import '../themes.dart';
+import 'news_announcements_screen.dart';
 
 final List<ServiceModel> _dropDownItems = [
   ServiceModel(name: "I want to apply for....")
@@ -92,6 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
           context.read<AuthProvider>().updateFcmToken(token!);
         });
       });
+      ////////
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        debugPrint('A new onMessageOpenedApp event was =+> $message');
+        nextScreen(context, const NewsAnnouncementsScreen());
+      });
+      ///////
     }
   }
 

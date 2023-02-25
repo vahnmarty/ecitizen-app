@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:citizen/providers/providers.dart';
 import 'package:citizen/screens/home_screen.dart';
+import 'package:citizen/screens/news_announcements_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import 'constants/constancts.dart';
 import 'notification/notificationservice.dart';
 
 Future<void> backgroundHandler(RemoteMessage fcmMessage) async {
@@ -43,6 +45,7 @@ void main() async {
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
       ?.requestPermission();
+
   runApp(const MyApp());
 }
 
@@ -120,9 +123,11 @@ class _MyAppState extends State<MyApp> {
         if (message.data != null) {
           message.data['title'];
           debugPrint('openapp title: ${message.data['title']}');
-          debugPrint('message in=>: ${message}');
+          debugPrint('message in=>: ${message.data}');
+          debugPrint('message in=>: ${message.notification}');
+
         }
-        ///////
+        //nextScreen(context, const NewsAnnouncementsScreen());
         // Navigator.pushNamed(
         //   context,
         //   '/message',
