@@ -231,7 +231,7 @@ class _DirectoryListItem extends StatelessWidget {
                     if (directory.email != '')
                       Expanded(
                         child: IconsAndText(
-                          text: directory.email!,
+                          text: "${directory.email}",
                           icon: Icons.mail_outline_sharp,
                           iconColor: AppColors.gradientPurple,
                           textColor: isSelected ? Colors.white : Colors.black,
@@ -246,7 +246,7 @@ class _DirectoryListItem extends StatelessWidget {
                     _CardButton(
                       email: false,
                       callback: () {
-                        makePhoneCall(directory.cellphone!);
+                        makePhoneCall("${directory.cellphone}");
                       },
                       isSelected: isSelected,
                     ),
@@ -257,7 +257,7 @@ class _DirectoryListItem extends StatelessWidget {
                     _CardButton(
                       email: true,
                       callback: () {
-                        openMail(context, directory.email!, directory.name!);
+                        openMail(context, "${directory.email}", "${directory.name}");
                       },
                       isSelected: isSelected,
                     ),

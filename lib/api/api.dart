@@ -1,6 +1,7 @@
 class Apis {
   //static const APP_BASE_URL = "http://ecitizenph.com/";
-  static const APP_BASE_URL = "http://staging.ecitizenph.com/";
+  static const APP_BASE_URL = "https://iligan.ecitizenph.com/";
+  //static const APP_BASE_URL = "http://staging.ecitizenph.com/";
   static const BASE_URL = APP_BASE_URL + "api/";
   static const login = "login";
   static const signup = "signup";
