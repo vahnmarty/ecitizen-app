@@ -6,7 +6,8 @@ import 'package:citizen/providers/news_provider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:telephony/telephony.dart';
+import 'package:geolocator/geolocator.dart';
+/*import 'package:telephony/telephony.dart';*/
 import 'package:citizen/constants/custom_route_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -296,17 +297,17 @@ Future<void> shareToTwitter(String link) async {
 }
 
 enum SMSSTATUS { SENT, NOTSENT, NOTCAPABLE, NOTGRANTED }
-
+/*
 final SmsSendStatusListener listener = (SendStatus status) {
   if (status == SendStatus.SENT) {
     return SMSSTATUS.SENT;
   }
   return SMSSTATUS.NOTSENT;
-};
+};*/
 openWebView(BuildContext context,String name){
   nextScreen(context, WebViewScreen(pageName: name));
 }
-sendSms(String message) async {
+/*sendSms(BuildContext context,String message) async {
   debugPrint('in sent');
   final Telephony telephony = Telephony.instance;
   try{
@@ -324,12 +325,18 @@ sendSms(String message) async {
               if (status == SendStatus.SENT) {
                 return SMSSTATUS.SENT;
               }
-
             });
       } else {
         return SMSSTATUS.NOTCAPABLE;
       }
     } else {
+      showAlertDialog(context, "Permission Required!",
+          "Please enable the permission to send sms!",
+          type: AlertType.WARNING,
+          okButtonText: "Grant Permission", onPress: () {
+            Navigator.of(context).pop();
+            Geolocator.openAppSettings();
+          });
       return SMSSTATUS.NOTGRANTED;
     }
   }catch(e){
@@ -337,7 +344,7 @@ sendSms(String message) async {
     return SMSSTATUS.NOTGRANTED;
   }
 
-}
+}*/
 
 saveNewsJson(dynamic news) async {
   final prefs = await SharedPreferences.getInstance();

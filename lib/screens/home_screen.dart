@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
         context.read<ServicesProvider>().getServices();
         context.read<NewsProvider>().gettingNews(Apis.news);
-        context.read<LocationProvider>().getCurrentLocation();
+        //context.read<LocationProvider>().getCurrentLocation(context);
         context.read<AuthProvider>().checkUserSession();
         _firebaseMessaging.getToken().then((String? token) async {
           debugPrint('fcm token: $token');
@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    context.read<LocationProvider>().getCurrentLocation();
+    //context.read<LocationProvider>().getCurrentLocation(context);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.mainBg,

@@ -5,6 +5,7 @@ import 'package:citizen/providers/location_provider.dart';
 import 'package:citizen/providers/services_provider.dart';
 import 'package:citizen/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -23,18 +24,60 @@ final List<String> _emergencies = [
   'Other'
 ];
 
-class ReportEmergencyScreen extends StatelessWidget {
+class ReportEmergencyScreen extends StatefulWidget {
   ReportEmergencyScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ReportEmergencyScreen> createState() => _ReportEmergencyScreenState();
+}
+
+class _ReportEmergencyScreenState extends State<ReportEmergencyScreen>
+    with WidgetsBindingObserver {
   final _locationController = TextEditingController();
+
   final _descriptionController = TextEditingController();
+
   ValueNotifier<String> _selectedValue = ValueNotifier('Fire');
+
   bool _checked = true;
+
   File? pickedImage;
+
   int _selectedIndex = 0;
 
   _handleSelectedIndex(int index) {
     _selectedIndex = index;
     _selectedValue.value = _emergencies[index];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    if (mounted) {
+      context.read<LocationProvider>().getCurrentLocation(context);
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      debugPrint("resumed");
+      LocationPermission permission = await Geolocator.checkPermission();
+      debugPrint("Permission+=> ${permission}");
+      if (permission != LocationPermission.deniedForever && permission != LocationPermission.denied) {
+        context.read<LocationProvider>().getCurrentLocation(context);
+        debugPrint("inside");
+      }
+
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   @override
@@ -201,8 +244,8 @@ class ReportEmergencyScreen extends StatelessWidget {
                           callback: () async {
                             bool connected = await internetConnectivity();
                             debugPrint('connected: $connected');
-                            if (!connected) {
-                              final result = await sendSms(
+                            /*if (!connected) {
+                              final result = await sendSms(context,
                                   'type:${_selectedIndex + 1}, Adr: ${_locationController.text}, lat: ${locProvider.lat}, lng: ${locProvider.lng}, Des: ${_descriptionController.text}');
                               //replaceScreen(context, HomeScreen());
                               debugPrint('sms result: $result');
@@ -252,7 +295,7 @@ class ReportEmergencyScreen extends StatelessWidget {
                                 });
                               }
                               return;
-                            }
+                            }*/
                             final token = await getToken();
                             if (token == false ||
                                 token == null ||
@@ -280,11 +323,11 @@ class ReportEmergencyScreen extends StatelessWidget {
                               return;
                             }
                             debugPrint('image path: $pickedImage');
-                            bool withImage=false;
+                            bool withImage = false;
                             dynamic data = {
                               "type": "${_selectedIndex + 1}",
                               "description":
-                              _descriptionController.text.toString(),
+                                  _descriptionController.text.toString(),
                               "latitude": locProvider.lat.toString(),
                               "longitude": locProvider.lng.toString(),
                               "address": _locationController.text.toString(),
@@ -292,7 +335,7 @@ class ReportEmergencyScreen extends StatelessWidget {
                             };
                             if (pickedImage != null) {
                               data["image"] = [pickedImage!.path];
-                              withImage=true;
+                              withImage = true;
                             }
                             //debugPrint('data: $data');
                             final res = await servicesProvider.reportEmergency(
